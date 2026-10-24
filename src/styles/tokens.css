@@ -1,0 +1,24 @@
+/* Shared design tokens. Every feature should use these instead of hard-coded values. */
+:root {
+  --color-bg: #fbf8fe;
+  --color-bg-soft: #f3eefb;
+  --color-surface: #ffffff;
+  --color-accent: #b8a4e3;
+  --color-accent-soft: #e9e1f7;
+  --color-accent-strong: #5b4796;
+  --color-ink: #1c1724;
+  --color-text: #2b2833;
+  --color-text-muted: #5c576b;
+  --color-border: #e6e0ef;
+  --color-danger: #b4232f;
+  --color-success: #3f7d5a;
+
+  --font-serif: "Bodoni Moda", "Playfair Display", Georgia, serif;
+  --font-sans: "Manrope", "Inter", system-ui, sans-serif;
+
+  --radius: 2px;
+  --shadow-soft: 0 10px 40px rgba(60, 40, 110, 0.06);
+
+  --container: 1440px;
+  --gutter: clamp(16px, 4vw, 56px);
+}
