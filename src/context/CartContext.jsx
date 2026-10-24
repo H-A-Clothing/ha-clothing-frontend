@@ -1,6 +1,5 @@
-// Cart state provider.
-// Minimal version so shop pages can add items and the header can show a count.
-// Member 2 owns this file and will connect it to the cart API.
+// Cart state provider (Member 2).
+// Stores only { productId, size, color, quantity } per line. Prices are looked up when the cart is shown.
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const CartContext = createContext(null);
@@ -14,6 +13,11 @@ function readStoredCart() {
   }
 }
 
+// Two cart lines are the same when product, size and colour all match.
+function isSameLine(a, b) {
+  return a.productId === b.productId && a.size === b.size && a.color === b.color;
+}
+
 export function CartProvider({ children }) {
   const [items, setItems] = useState(readStoredCart);
 
@@ -24,21 +28,30 @@ export function CartProvider({ children }) {
   const value = useMemo(() => {
     const addItem = ({ productId, size, color, quantity = 1 }) =>
       setItems((prev) => {
-        const existing = prev.find(
-          (item) => item.productId === productId && item.size === size && item.color === color
-        );
+        const newLine = { productId, size, color, quantity };
+        const existing = prev.find((item) => isSameLine(item, newLine));
         if (existing) {
           return prev.map((item) =>
             item === existing ? { ...item, quantity: item.quantity + quantity } : item
           );
         }
-        return [...prev, { productId, size, color, quantity }];
+        return [...prev, newLine];
       });
+
+    const updateQuantity = (line, quantity) =>
+      setItems((prev) =>
+        prev.map((item) => (isSameLine(item, line) ? { ...item, quantity } : item))
+      );
+
+    const removeItem = (line) =>
+      setItems((prev) => prev.filter((item) => !isSameLine(item, line)));
 
     return {
       items,
       itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
       addItem,
+      updateQuantity,
+      removeItem,
       clear: () => setItems([]),
     };
   }, [items]);
