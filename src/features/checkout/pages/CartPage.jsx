@@ -7,6 +7,8 @@ import { useCart } from "../../../context/CartContext";
 import { useFetch } from "../../../hooks/useFetch";
 import { pluralize } from "../../../utils/formatters";
 import CartItem from "../components/CartItem";
+import CartSummary from "../components/CartSummary";
+import FreeShippingBar from "../components/FreeShippingBar";
 import "../checkout.css";
 
 export default function CartPage() {
@@ -14,6 +16,9 @@ export default function CartPage() {
 
   // Re-run whenever the cart changes. JSON.stringify turns the array into text so React can compare it.
   const { data: summary, error } = useFetch(() => getCartSummary(items), [JSON.stringify(items)]);
+
+    // True when any line asks for more than is in stock. The customer must fix it before checkout.
+  const hasStockProblem = summary?.lines.some((line) => line.quantity > line.maxQuantity) ?? false;
 
   if (items.length === 0) {
     return (
@@ -43,15 +48,23 @@ export default function CartPage() {
 
       {error && <p className="form-error">We couldn't load your bag. Please refresh the page.</p>}
 
-      <div className="cart-lines">
-        {summary?.lines.map((line) => (
-          <CartItem
-            key={`${line.productId}-${line.size}-${line.color}`}
-            line={line}
-            onChangeQuantity={(quantity) => updateQuantity(line, quantity)}
-            onRemove={() => removeItem(line)}
-          />
-        ))}
+            {summary && (
+        <FreeShippingBar subtotal={summary.subtotal} threshold={summary.freeShippingThreshold} />
+      )}
+
+      <div className="cart-layout">
+        <div className="cart-lines">
+          {summary?.lines.map((line) => (
+            <CartItem
+              key={`${line.productId}-${line.size}-${line.color}`}
+              line={line}
+              onChangeQuantity={(quantity) => updateQuantity(line, quantity)}
+              onRemove={() => removeItem(line)}
+            />
+          ))}
+        </div>
+
+        {summary && <CartSummary summary={summary} canCheckout={!hasStockProblem} />}
       </div>
     </div>
   );
