@@ -1,0 +1,70 @@
+/* Member 2 – bag and checkout styles. Uses the shared tokens in src/styles/tokens.css. */
+
+.cart-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.cart-lines {
+  display: grid;
+  gap: 20px;
+  max-width: 760px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 24px;
+  padding: 20px;
+}
+
+.cart-item__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cart-item__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cart-item__name {
+  display: block;
+  margin: 6px 0;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--color-ink);
+}
+
+.cart-item__meta {
+  font-size: 14px;
+}
+
+.cart-item__total {
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.cart-item__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 600px) {
+  .cart-item {
+    grid-template-columns: 96px 1fr;
+    gap: 16px;
+    padding: 14px;
+  }
+
+  .cart-item__top {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

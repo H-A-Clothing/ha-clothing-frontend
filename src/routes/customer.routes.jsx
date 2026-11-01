@@ -16,6 +16,9 @@ import PaymentPage from "../features/payment/pages/PaymentPage";
 import PaymentSuccessPage from "../features/payment/pages/PaymentSuccessPage";
 import PaymentFailurePage from "../features/payment/pages/PaymentFailurePage";
 
+// M2 – cart
+import CartPage from "../features/checkout/pages/CartPage";
+
 export const customerRoutes = [
   {
     element: <SiteLayout />,
@@ -34,6 +37,11 @@ export const customerRoutes = [
       // M2 (cart), M3 (account) and M8 (store info, FAQ, policies) add routes here.
 
       { path: "*", element: <NotFound /> },
+
+
+      { path: "/cart", element: <CartPage /> },
+
+
     ],
   },
   {
