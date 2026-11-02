@@ -26,6 +26,7 @@ const PATHS = {
   menu: <><path d="M5 7h14M5 12h14M5 17h14" /></>,
   settings: <><circle cx="12" cy="12" r="3" /><path d="m19.4 15 .1.1 1.1.9-1.2 2.1-1.3-.5a7.8 7.8 0 0 1-1.4.8l-.2 1.4h-2.5l-.3-1.4a7.8 7.8 0 0 1-1.5-.8l-1.3.5-1.2-2.1 1.1-.9a7.5 7.5 0 0 1 0-1.7l-1.1-.9 1.2-2.1 1.3.5a7.8 7.8 0 0 1 1.5-.8l.3-1.4h2.5l.2 1.4a7.8 7.8 0 0 1 1.4.8l1.3-.5 1.2 2.1-1.1.9a7.5 7.5 0 0 1 0 1.7Z" transform="translate(-1 -1) scale(.94)" /></>,
   logout: <><path d="M10 17l5-5-5-5M15 12H3" /><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7" /></>,
+  plus: <><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></>,
 };
 
 export default function Icon({ name, size = 20, strokeWidth = 1.5, className }) {

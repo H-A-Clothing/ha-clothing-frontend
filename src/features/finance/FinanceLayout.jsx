@@ -15,7 +15,6 @@ export default function FinanceLayout() {
   return <main className="finance-app">
     <aside className="expense-sidebar">
       <Link to="/admin/finance" className="expense-brand"><div className="expense-logo">H&amp;A</div><div><strong>H&amp;A</strong><small>Haute Lilac Atelier</small></div></Link>
-      <button className="atelier-switcher" type="button"><span className="atelier-dot"/> Paris Flagship Atelier <b>V3</b></button>
       <div className="expense-nav-label">Financial Ledger</div>
       <nav className="expense-nav">{financeNavigation.map(([icon, label, to]) => {
         const active = pathname === to || (to === "/admin/finance/expenses" && pathname.startsWith(to));
@@ -31,5 +30,5 @@ export default function FinanceLayout() {
 }
 
 export function FinanceSection({ title }) {
-  return <section className="expense-content finance-section-placeholder"><span className="modal-eyebrow">Financial Ledger</span><h1>{title}</h1><p>This finance section is ready to be implemented.</p></section>;
+  return <section className="expense-content reference-expense-page finance-section-placeholder"><div className="reference-heading"><div className="reference-title-block"><h1>{title}</h1><p>Review and manage {title.toLowerCase()}.</p></div></div></section>;
 }

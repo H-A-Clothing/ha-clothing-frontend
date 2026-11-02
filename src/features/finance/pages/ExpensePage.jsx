@@ -14,7 +14,7 @@ const seedExpenses = [
 const categories = ["All Categories", "Raw Silk & Fabric", "Atelier Rent", "Courier & Logistics", "Software & Subscriptions"];
 const fmt = (amount) => new Intl.NumberFormat("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
 const displayDate = (value) => { const [year, month, day] = value.split("-"); return `${year}-${month}-${day}`; };
-const sharedIconNames = { journal: "bag", calendar: "grid", download: "arrowUpRight", plus: "grid", receipt: "bag", refresh: "arrowRight", bankmini: "grid" };
+const sharedIconNames = { journal: "bag", calendar: "grid", download: "arrowUpRight", receipt: "bag", refresh: "arrowRight", bankmini: "grid" };
 function FinanceIcon({ name, ...props }) { return <Icon name={sharedIconNames[name] || name} {...props}/>; }
 
 function ExpenseForm({ onSave, onClose }) {
@@ -87,7 +87,7 @@ export default function ExpensePage({ mode = "list" }) {
   const exportCsv = () => { const rows = [["Date", "Reference", "Category", "Vendor", "Description", "Method", "Amount (LKR)", "Status"], ...filteredExpenses.map((item) => [item.date, item.reference, item.category, item.vendor, item.description, item.payment, item.amount, item.status])]; const csv = rows.map((row) => row.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\r\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "expense-journal.csv"; anchor.click(); URL.revokeObjectURL(url); };
 
   return <div className="expense-content reference-expense-page">
-    <div className="reference-heading"><div className="reference-title-block"><div className="reference-eyebrow"><span>Fiscal Q2 2025 Audit</span><i/> IFRS Compliant <b>·</b> Valued in Multi-Currency Reserve</div><h1>Haute Couture<br/><em>Expense Management</em></h1><p>Consolidated disbursements, raw material procurement settlements, and operational atelier outlays across flagship and bespoke private capsules.</p></div><div className="reference-heading-actions"><div className="period-control">{["Weekly", "Monthly Q2", "Drops"].map((value) => <button type="button" className={period === value ? "is-selected" : ""} onClick={() => setPeriod(value)} key={value}>{value}</button>)}</div><button type="button" className="expense-button export-button" onClick={exportCsv}><FinanceIcon name="download" size={14}/> Export CSV</button></div></div>
+    <div className="reference-heading"><div className="reference-title-block"><h1>Expense Management</h1><p>Review and manage operational expenses</p></div><div className="reference-heading-actions"><div className="period-control">{["Weekly", "Monthly Q2", "Drops"].map((value) => <button type="button" className={period === value ? "is-selected" : ""} onClick={() => setPeriod(value)} key={value}>{value}</button>)}</div><button type="button" className="expense-button export-button" onClick={exportCsv}><FinanceIcon name="download" size={14}/> Export CSV</button></div></div>
     {notice && <p className="expense-notice" role="status">{notice}</p>}
     <section className="expense-kpis" aria-label="Expense summary">
       <article className="expense-kpi"><div className="kpi-label">Gross Expenses YTD <FinanceIcon name="receipt" size={15}/></div><strong>Rs. {fmt(activeTotal)} <small>LKR</small></strong><small><i>↗ +8.4%</i> vs Q1 Paris plan</small></article>

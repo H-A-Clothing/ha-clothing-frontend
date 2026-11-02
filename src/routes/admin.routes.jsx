@@ -7,7 +7,7 @@ export const adminRoutes = [
     path: "/admin/finance",
     element: <FinanceLayout />,
     children: [
-      { index: true, element: <FinanceSection title="Financial Dashboard" /> },
+      { index: true, element: <FinanceSection title="Dashboard" /> },
       { path: "expenses", element: <ExpensePage /> },
       { path: "expenses/new", element: <ExpensePage mode="new" /> },
       { path: "product-costs", element: <FinanceSection title="Product Costs" /> },
