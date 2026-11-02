@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Icon from "../../../components/Icon";
 import "../finance.css";
 
 const seedExpenses = [
@@ -13,41 +14,8 @@ const seedExpenses = [
 const categories = ["All Categories", "Raw Silk & Fabric", "Atelier Rent", "Courier & Logistics", "Software & Subscriptions"];
 const fmt = (amount) => new Intl.NumberFormat("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
 const displayDate = (value) => { const [year, month, day] = value.split("-"); return `${year}-${month}-${day}`; };
-
-function Icon({ name, size = 16 }) {
-  const paths = {
-    grid: <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
-    journal: <><path d="M5 3h14v18H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M7 7h9M7 11h9M7 15h6M8 3v18"/></>,
-    box: <><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 8h16M9 12h6M9 16h6"/></>,
-    chart: <><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 16v-4M12 16V8M16 16v-6"/></>,
-    bank: <><path d="m3 9 9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18M2 18h20"/></>,
-    settings: <><path d="M4 6h16M4 12h16M4 18h16M8 4v4M15 10v4M11 16v4"/></>,
-    calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></>,
-    download: <><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 18v3h16v-3"/></>,
-    plus: <><path d="M12 5v14M5 12h14"/></>,
-    receipt: <><path d="M5 3h14v18l-3-2-4 2-4-2-3 2zM8 8h8M8 12h8M8 16h5"/></>,
-    refresh: <><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.4-3"/></>,
-    close: <><path d="m18 6-12 12M6 6l12 12"/></>,
-    check: <path d="m5 12 4 4L19 6"/>,
-    lock: <><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></>,
-    bankmini: <><path d="m3 9 9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18"/></>,
-  };
-  return <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
-}
-
-function Sidebar() {
-  const nav = [["grid", "Dashboard", false], ["journal", "Expense Management", true], ["box", "Product Costs", false], ["chart", "Reports", false], ["bank", "Reconciliation", false], ["settings", "Settings", false]];
-  return <aside className="expense-sidebar">
-    <div className="expense-brand"><div className="expense-logo">H<span>&amp;A</span></div><div><strong>H&amp;A Atelier</strong><small>Finance Back-Office</small></div></div>
-    <div className="expense-nav-label">Financial Ledger</div>
-    <nav className="expense-nav">{nav.map(([icon, label, active]) => <div className={`expense-nav-item${active ? " is-active" : ""}`} key={label}><Icon name={icon}/><span>{label}</span></div>)}</nav>
-    <div className="expense-ledger"><span>Ledger Base</span><strong>LKR (Rs)</strong><Icon name="lock" size={13}/></div>
-  </aside>;
-}
-
-function Topbar() {
-  return <header className="expense-topbar"><div className="top-chip"><i/> PROD · NEON DB CONNECTED</div><span className="top-divider"/><div className="top-chip currency-chip">CURRENCY: LKR (Rs)</div><div className="top-cycle"><Icon name="calendar" size={13}/> FISCAL Q3 · CURRENT CYCLE <span>⌄</span></div><span className="top-divider"/><div className="top-user"><span><strong>Member 7</strong><small>Finance Admin</small></span><div className="user-avatar">H</div></div></header>;
-}
+const sharedIconNames = { journal: "bag", calendar: "grid", download: "arrowUpRight", plus: "grid", receipt: "bag", refresh: "arrowRight", bankmini: "grid" };
+function FinanceIcon({ name, ...props }) { return <Icon name={sharedIconNames[name] || name} {...props}/>; }
 
 function ExpenseForm({ onSave, onClose }) {
   const [form, setForm] = useState({ category: "Courier & Logistics", date: "2026-02-28", description: "Mulberry Silk Organza Bolts - Colombo Handloom Weavers", amount: "385000.00", payment: "Petty Cash", reference: "BT-2026-NATIONS-882", notes: "Approved for Spring 2026 Couture collection fabric procurement." });
@@ -61,7 +29,7 @@ function ExpenseForm({ onSave, onClose }) {
   return <div className="expense-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <section className="expense-modal" role="dialog" aria-modal="true" aria-labelledby="expense-form-title">
       <div className="modal-accent"/><div className="expense-modal-inner">
-        <div className="modal-heading"><div><span className="modal-eyebrow">Disbursements Ledger</span><h2 id="expense-form-title">Record Expense</h2></div><button className="icon-button" type="button" onClick={onClose} aria-label="Close"><Icon name="close" size={19}/></button></div>
+        <div className="modal-heading"><div><span className="modal-eyebrow">Disbursements Ledger</span><h2 id="expense-form-title">Record Expense</h2></div><button className="icon-button" type="button" onClick={onClose} aria-label="Close"><FinanceIcon name="close" size={19}/></button></div>
         <form onSubmit={submit}>
           <div className="form-grid">
             <label className="expense-field"><span>Expense Category <b>*</b></span><select name="category" value={form.category} onChange={update}>{categories.slice(1).map((category) => <option key={category}>{category}</option>)}</select></label>
@@ -73,18 +41,17 @@ function ExpenseForm({ onSave, onClose }) {
             <label className="expense-field field-full"><span>Notes / Remarks</span><textarea name="notes" value={form.notes} onChange={update}/></label>
           </div>
           {error && <p className="expense-form-error" role="alert">{error}</p>}
-          <div className="expense-form-actions"><button className="expense-button cancel-button" type="button" onClick={onClose}>Cancel</button><button className="expense-button save-button" type="submit"><Icon name="check" size={14}/> Save Expense</button></div>
+          <div className="expense-form-actions"><button className="expense-button cancel-button" type="button" onClick={onClose}>Cancel</button><button className="expense-button save-button" type="submit"><FinanceIcon name="check" size={14}/> Save Expense</button></div>
         </form>
       </div>
     </section>
   </div>;
 }
-
 export default function ExpensePage({ mode = "list" }) {
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState(() => { try { return JSON.parse(localStorage.getItem("ha-finance-expenses")) || seedExpenses; } catch { return seedExpenses; } });
   const [category, setCategory] = useState("All Categories");
-  const [period, setPeriod] = useState("This Month");
+  const [period, setPeriod] = useState("Monthly Q2");
   const [status, setStatus] = useState("All");
   const [query, setQuery] = useState("");
   const [notice, setNotice] = useState("");
@@ -113,14 +80,25 @@ export default function ExpensePage({ mode = "list" }) {
     navigate("/admin/finance/expenses");
   };
 
-  return <main className="finance-app"><Sidebar/><div className="expense-workspace"><Topbar/><div className="expense-content">
-    <div className="expense-page-heading"><div><h1>Expense Management</h1><p>Track, review, and record company operational expenditures</p></div><div className="expense-heading-actions"><button type="button" className="expense-button export-button" onClick={() => { const rows = [["Date", "Category", "Description", "Vendor", "Payment", "Amount (LKR)", "Status"], ...filteredExpenses.map((item) => [item.date, item.category, item.description, item.vendor, item.payment, item.amount, item.status])]; const csv = rows.map((row) => row.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\r\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "expense-journal.csv"; anchor.click(); URL.revokeObjectURL(url); }}><Icon name="download" size={13}/> Export CSV</button><Link to="/admin/finance/expenses/new" className="expense-button record-button"><Icon name="plus" size={15}/> Record Expense</Link></div></div>
+  const activeCount = filteredExpenses.filter((expense) => expense.status === "Active").length;
+  const averageExpense = activeCount ? activeTotal / activeCount : 0;
+  const categoryCount = filteredExpenses.filter((expense) => expense.category === "Raw Silk & Fabric" && expense.status === "Active").length;
+  const setCategoryFilter = (value) => setCategory(value);
+  const exportCsv = () => { const rows = [["Date", "Reference", "Category", "Vendor", "Description", "Method", "Amount (LKR)", "Status"], ...filteredExpenses.map((item) => [item.date, item.reference, item.category, item.vendor, item.description, item.payment, item.amount, item.status])]; const csv = rows.map((row) => row.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\r\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "expense-journal.csv"; anchor.click(); URL.revokeObjectURL(url); };
+
+  return <div className="expense-content reference-expense-page">
+    <div className="reference-heading"><div className="reference-title-block"><div className="reference-eyebrow"><span>Fiscal Q2 2025 Audit</span><i/> IFRS Compliant <b>·</b> Valued in Multi-Currency Reserve</div><h1>Haute Couture<br/><em>Expense Management</em></h1><p>Consolidated disbursements, raw material procurement settlements, and operational atelier outlays across flagship and bespoke private capsules.</p></div><div className="reference-heading-actions"><div className="period-control">{["Weekly", "Monthly Q2", "Drops"].map((value) => <button type="button" className={period === value ? "is-selected" : ""} onClick={() => setPeriod(value)} key={value}>{value}</button>)}</div><button type="button" className="expense-button export-button" onClick={exportCsv}><FinanceIcon name="download" size={14}/> Export CSV</button></div></div>
     {notice && <p className="expense-notice" role="status">{notice}</p>}
-    <section className="expense-filters" aria-label="Filter expenses"><div className="filter-top-row"><div className="filter-group"><span className="filter-label">Date Range:</span>{["This Month", "Last Month", "Last 30 Days"].map((value) => <button type="button" key={value} className={`filter-chip${period === value ? " selected" : ""}`} onClick={() => setPeriod(value)}>{value}</button>)}<div className="date-range"><Icon name="calendar" size={13}/><input aria-label="Start date" type="date" defaultValue="2026-02-01"/><span>–</span><input aria-label="End date" type="date" defaultValue="2026-02-28"/></div></div><div className="filter-group status-filter"><span className="filter-label">Status:</span>{[["All", "24"], ["Active", "22"], ["Voided", "2"]].map(([value, count]) => <button type="button" key={value} className={`status-chip${status === value ? " selected" : ""}`} onClick={() => setStatus(value)}>{value}<small>({count})</small></button>)}</div></div><div className="category-row"><span className="filter-label">Category:</span>{categories.map((value) => <button type="button" key={value} className={`category-chip${category === value ? " selected" : ""}`} onClick={() => setCategory(value)}>{value}</button>)}</div></section>
-    <section className="expense-total"><div><span className="total-caption">Total Filtered Expenses</span><div className="total-value">Rs. {fmt(activeTotal)} <small>({filteredExpenses.filter((expense) => expense.status === "Active").length} items active)</small></div></div><div className="total-voided">{voidedCount} voided items excluded</div><div className="total-icon"><Icon name="receipt" size={18}/></div></section>
-    <section className="expense-journal"><div className="journal-heading"><div><h2>Expense Journal</h2><span className="quarter-tag">Fiscal Q3</span></div><label className="journal-search"><span className="visually-hidden">Search expenses</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="⌕ Search expenses"/></label><span className="updated-label"><Icon name="refresh" size={12}/> Updated recently</span></div>
-      <div className="expense-table-wrap"><table className="expense-table"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Payment<br/>Method</th><th>Amount (LKR)</th><th>Status</th></tr></thead><tbody>{filteredExpenses.map((expense, index) => <tr key={`${expense.reference}-${index}`}><td className="expense-date">{displayDate(expense.date)}</td><td><span className="expense-category-tag">{expense.category}</span></td><td><div className="expense-description">{expense.description}</div><small className="expense-reference">Ref: {expense.reference} · Vendor: {expense.vendor}</small></td><td><span className="payment-method"><Icon name="bankmini" size={13}/>{expense.payment}</span></td><td className="expense-amount">{fmt(expense.amount)}</td><td><span className={`expense-status${expense.status === "Voided" ? " is-voided" : ""}`}><i/>{expense.status}</span></td></tr>)}</tbody></table>{filteredExpenses.length === 0 && <div className="expense-empty">No expenses match your filters.</div>}</div><div className="journal-footer">Showing {filteredExpenses.length} of {expenses.length} expenses <div><button type="button" disabled>← Previous</button><button type="button" className="page-selected">1</button><button type="button">Next →</button></div></div>
+    <section className="expense-kpis" aria-label="Expense summary">
+      <article className="expense-kpi"><div className="kpi-label">Gross Expenses YTD <FinanceIcon name="receipt" size={15}/></div><strong>Rs. {fmt(activeTotal)} <small>LKR</small></strong><small><i>↗ +8.4%</i> vs Q1 Paris plan</small></article>
+      <article className="expense-kpi"><div className="kpi-label">Average Disbursement <FinanceIcon name="lock" size={15}/></div><strong>Rs. {fmt(averageExpense)}</strong><small><i>↗ +3.2%</i> Vendor invoice average</small></article>
+      <article className="expense-kpi"><div className="kpi-label">Artisanal Procurement <FinanceIcon name="bag" size={15}/></div><strong>{activeCount ? Math.round(categoryCount / activeCount * 100) : 0}% <small>of total</small></strong><small><b className="kpi-dot"/> Direct atelier craft &amp; silk</small></article>
+      <article className="expense-kpi"><div className="kpi-label">Solvency &amp; Treasury <FinanceIcon name="grid" size={15}/></div><strong>Rs. {fmt(activeTotal * 1.12)} <small>LKR</small></strong><small><i className="kpi-dark-pill">99.4% liquid</i> Unleveraged</small></article>
+    </section>
+    <section className="expense-journal reference-ledger"><div className="reference-ledger-heading"><div><h2>Operational Expense Ledger</h2><p>Verified disbursements under IFRS French Haute Couture Governance</p></div><div className="ledger-actions"><div className="ledger-categories" aria-label="Filter by category">{[["All Categories", "All Categories"], ["Raw Silk & Fabric", "Raw Fabrics"], ["Courier & Logistics", "Artisan Fees"], ["Atelier Rent", "Studio OpEx"]].map(([value, label]) => <button type="button" className={category === value ? "is-selected" : ""} onClick={() => setCategoryFilter(value)} key={label}>{label}</button>)}</div><Link to="/admin/finance/expenses/new" className="expense-button record-button"><FinanceIcon name="plus" size={15}/> Record Expense</Link></div></div><div className="ledger-rule"/>
+      <div className="expense-table-wrap"><table className="expense-table reference-table"><thead><tr><th>Date</th><th>Reference / Voucher</th><th>Category</th><th>Vendor / Beneficiary</th><th>Method</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>{filteredExpenses.map((expense, index) => <tr key={`${expense.reference}-${index}`}><td className="expense-date">{new Date(`${expense.date}T12:00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</td><td className="voucher-cell">{expense.reference}</td><td><span className="expense-category-tag">{expense.category}</span></td><td><strong className="vendor-name">{expense.vendor}</strong><small className="expense-reference">{expense.description}</small></td><td className="payment-method">{expense.payment}</td><td className="expense-amount">Rs. {fmt(expense.amount)}</td><td><span className={`expense-status${expense.status === "Voided" ? " is-voided" : ""}`}><i/>{expense.status === "Active" ? "Settled" : "Audited"}</span></td><td><button type="button" className="row-action" aria-label={`More actions for ${expense.reference}`}>⋮</button></td></tr>)}</tbody></table>{filteredExpenses.length === 0 && <div className="expense-empty">No expenses match your filters.</div>}</div><div className="journal-footer"><span>Showing {filteredExpenses.length} of {expenses.length} expense vouchers for Q2 2025</span><div><button type="button" disabled>Previous</button><button type="button" className="page-selected">1</button><button type="button">2</button><button type="button">3</button><button type="button">Next</button></div></div>
     </section>
     <footer className="expense-footer"><span>H&amp;A Atelier · Finance Ledger</span><span>Secure disbursements · LKR (Rs)</span></footer>
-    </div></div>{isForm && <ExpenseForm onSave={saveExpense} onClose={() => navigate("/admin/finance/expenses")}/>}</main>;
+    {isForm && <ExpenseForm onSave={saveExpense} onClose={() => navigate("/admin/finance/expenses")}/>}
+  </div>;
 }
