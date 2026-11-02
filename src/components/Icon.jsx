@@ -20,7 +20,7 @@ const PATHS = {
   copy: <><rect x="8" y="8" width="12" height="12" rx="1" /><path d="M16 8V4H4v12h4" /></>,
   leaf: <path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Zm0 0 7-7" />,
   scissors: <><circle cx="6" cy="7" r="2.5" /><circle cx="6" cy="17" r="2.5" /><path d="m8 8.5 12 9M8 15.5l12-9" /></>,
-  grid: <><rect x="4" y="4" width="7" height="7" /><rect x="13" y="4" width="7" height="7" /><rect x="4" y="13" width="7" height="7" /><rect x="13" y="13" width="7" height="7" /></>,
+  grid: <><rect x="3.5" y="3.5" width="8" height="8" rx=".5" /><rect x="13.5" y="3.5" width="7" height="5" rx=".5" /><rect x="13.5" y="10.5" width="7" height="10" rx=".5" /><rect x="3.5" y="13.5" width="8" height="7" rx=".5" /></>,
   filter: <path d="M4 6h16M7 12h10M10 18h4" />,
   file: <><path d="M6 3h8l4 4v14H6z" /><path d="M14 3v5h5M9 13h6M9 17h6" /></>,
   menu: <><path d="M5 7h14M5 12h14M5 17h14" /></>,
