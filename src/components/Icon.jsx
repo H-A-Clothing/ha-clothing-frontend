@@ -20,8 +20,13 @@ const PATHS = {
   copy: <><rect x="8" y="8" width="12" height="12" rx="1" /><path d="M16 8V4H4v12h4" /></>,
   leaf: <path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Zm0 0 7-7" />,
   scissors: <><circle cx="6" cy="7" r="2.5" /><circle cx="6" cy="17" r="2.5" /><path d="m8 8.5 12 9M8 15.5l12-9" /></>,
-  grid: <><rect x="4" y="4" width="7" height="7" /><rect x="13" y="4" width="7" height="7" /><rect x="4" y="13" width="7" height="7" /><rect x="13" y="13" width="7" height="7" /></>,
+  grid: <><rect x="3.5" y="3.5" width="8" height="8" rx=".5" /><rect x="13.5" y="3.5" width="7" height="5" rx=".5" /><rect x="13.5" y="10.5" width="7" height="10" rx=".5" /><rect x="3.5" y="13.5" width="8" height="7" rx=".5" /></>,
   filter: <path d="M4 6h16M7 12h10M10 18h4" />,
+  file: <><path d="M6 3h8l4 4v14H6z" /><path d="M14 3v5h5M9 13h6M9 17h6" /></>,
+  menu: <><path d="M5 7h14M5 12h14M5 17h14" /></>,
+  settings: <><circle cx="12" cy="12" r="3" /><path d="m19.4 15 .1.1 1.1.9-1.2 2.1-1.3-.5a7.8 7.8 0 0 1-1.4.8l-.2 1.4h-2.5l-.3-1.4a7.8 7.8 0 0 1-1.5-.8l-1.3.5-1.2-2.1 1.1-.9a7.5 7.5 0 0 1 0-1.7l-1.1-.9 1.2-2.1 1.3.5a7.8 7.8 0 0 1 1.5-.8l.3-1.4h2.5l.2 1.4a7.8 7.8 0 0 1 1.4.8l1.3-.5 1.2 2.1-1.1.9a7.5 7.5 0 0 1 0 1.7Z" transform="translate(-1 -1) scale(.94)" /></>,
+  logout: <><path d="M10 17l5-5-5-5M15 12H3" /><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7" /></>,
+  plus: <><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></>,
 };
 
 export default function Icon({ name, size = 20, strokeWidth = 1.5, className }) {
