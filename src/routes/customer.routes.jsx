@@ -19,6 +19,8 @@ import PaymentFailurePage from "../features/payment/pages/PaymentFailurePage";
 // M2 – cart
 import CartPage from "../features/checkout/pages/CartPage";
 
+import CheckoutPage from "../features/checkout/pages/CheckoutPage";
+
 export const customerRoutes = [
   {
     element: <SiteLayout />,
@@ -47,7 +49,9 @@ export const customerRoutes = [
   {
     element: <CheckoutLayout />,
     children: [
-      // M2 adds /checkout routes here.
+      
+      // M2 – checkout
+      { path: "/checkout", element: <CheckoutPage /> },
 
       // M1 – payment
       { path: "/payment", element: <PaymentPage /> },
