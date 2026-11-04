@@ -1,8 +1,12 @@
+import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Icon from "../../../components/Icon";
 import { CheckoutSteps } from "../../../components/layout/CheckoutLayout";
+import { cancelStripePayment } from "../../../api/payments-stripe";
+import { PAYMENT_STATUS } from "../../../utils/constants";
 import { formatPrice } from "../../../utils/formatters";
 import { usePaymentStatus } from "../hooks/usePaymentStatus";
+import { forgetIdempotencyKey } from "../idempotencyKey";
 import "../payment.css";
 
 const NEXT_STEPS = [
@@ -14,10 +18,25 @@ const NEXT_STEPS = [
 export default function PaymentFailurePage() {
   const [searchParams] = useSearchParams();
   const reference = searchParams.get("ref");
+  const cancelledOnStripe = searchParams.get("cancelled") === "1";
   const { payment, loading } = usePaymentStatus(reference);
 
   const orderId = payment?.orderId ?? payment?.order?.id;
   const retryUrl = orderId ? `/payment?order=${encodeURIComponent(orderId)}` : "/cart";
+  const closed = payment?.status === PAYMENT_STATUS.FAILED || payment?.status === PAYMENT_STATUS.CANCELLED;
+  const cancelled = cancelledOnStripe || payment?.status === PAYMENT_STATUS.CANCELLED;
+
+  // Back from Stripe's page: close that page, so it can't be paid later. The status polling picks up the change.
+  useEffect(() => {
+    if (cancelledOnStripe && reference) {
+      cancelStripePayment(reference).catch(() => {});
+    }
+  }, [cancelledOnStripe, reference]);
+
+  // This attempt is over, so "Try again" must start a new one with a new key.
+  useEffect(() => {
+    if (closed && orderId) forgetIdempotencyKey(orderId);
+  }, [closed, orderId]);
 
   return (
     <div className="container container--narrow">
@@ -40,7 +59,7 @@ export default function PaymentFailurePage() {
                   {" "}of <strong>{formatPrice(payment.amount)}</strong>
                 </>
               ) : null}{" "}
-              could not be authorised.
+              {cancelled ? "was cancelled." : "could not be authorised."}
             </p>
             {payment?.failureReason && <blockquote>“{payment.failureReason}”</blockquote>}
             <p className="muted">

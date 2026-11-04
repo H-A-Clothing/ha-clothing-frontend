@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Icon from "../../../components/Icon";
 import { CheckoutSteps } from "../../../components/layout/CheckoutLayout";
@@ -8,18 +8,25 @@ import { PAYMENT_METHODS, PAYMENT_STATUS } from "../../../utils/constants";
 import { formatPrice } from "../../../utils/formatters";
 import OrderSummary from "../components/OrderSummary";
 import PaymentMethodOption from "../components/PaymentMethodOption";
-import StripeCardFields from "../components/StripeCardFields";
+import { getIdempotencyKey } from "../idempotencyKey";
 import "../payment.css";
 
-// One idempotency key per order, so retries and double clicks can't create a second payment.
-function getIdempotencyKey(orderId) {
-  const storageKey = `ha-pay-key-${orderId}`;
-  let key = sessionStorage.getItem(storageKey);
-  if (!key) {
-    key = crypto.randomUUID();
-    sessionStorage.setItem(storageKey, key);
-  }
-  return key;
+const CLOSED_STATUSES = [PAYMENT_STATUS.FAILED, PAYMENT_STATUS.CANCELLED];
+
+// PayHere needs a real form POST (with a signed hash), not a link.
+function submitPayHereForm({ action, fields }) {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = action;
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+  document.body.appendChild(form);
+  form.submit();
 }
 
 export default function PaymentPage() {
@@ -29,9 +36,17 @@ export default function PaymentPage() {
   const { data: order, loading, error } = useFetch(() => getOrderForPayment(orderId), [orderId]);
 
   const [method, setMethod] = useState(PAYMENT_METHODS.STRIPE);
-  const [billingMatches, setBillingMatches] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  // The browser's back button from Stripe can restore this page from its cache, still "Redirecting…".
+  useEffect(() => {
+    const reset = (event) => {
+      if (event.persisted) setSubmitting(false);
+    };
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
 
   const pay = async (event) => {
     event.preventDefault();
@@ -46,12 +61,17 @@ export default function PaymentPage() {
         idempotencyKey: getIdempotencyKey(order.id),
       });
 
+      // Card details are typed on Stripe's / PayHere's own page, never on ours.
+      // They send the customer back to /payment/success or /payment/failure.
       if (result.redirectUrl) {
-        // Hosted payment page (Stripe Checkout or PayHere) returns to /payment/success or /payment/failure.
         window.location.assign(result.redirectUrl);
         return;
       }
-      const target = result.status === PAYMENT_STATUS.FAILED ? "failure" : "success";
+      if (result.payhere) {
+        submitPayHereForm(result.payhere);
+        return;
+      }
+      const target = CLOSED_STATUSES.includes(result.status) ? "failure" : "success";
       navigate(`/payment/${target}?ref=${encodeURIComponent(result.reference)}`);
     } catch (err) {
       setSubmitError(err.message || "We couldn't start the payment. Please try again.");
@@ -66,6 +86,17 @@ export default function PaymentPage() {
       <div className="container pay-center">
         <h1>We couldn't load your order</h1>
         <Link to="/cart" className="btn btn--primary">Back to bag</Link>
+      </div>
+    );
+  }
+
+  if (order.status && order.status !== "pending_payment") {
+    return (
+      <div className="container pay-center">
+        <h1>
+          Order #{order.id} {order.status === "cancelled" ? "was cancelled" : "is already paid"}
+        </h1>
+        <Link to="/shop" className="btn btn--primary">Continue shopping</Link>
       </div>
     );
   }
@@ -94,7 +125,9 @@ export default function PaymentPage() {
             description="International cards, processed securely by Stripe"
             badges={["Visa", "MC", "Amex"]}
           >
-            <StripeCardFields />
+            <p className="muted pay-method__note">
+              You'll enter your card on Stripe's secure page, then come back here.
+            </p>
           </PaymentMethodOption>
 
           <PaymentMethodOption
@@ -110,20 +143,17 @@ export default function PaymentPage() {
             </p>
           </PaymentMethodOption>
 
-          <label className="checkbox pay-billing">
-            <input type="checkbox" checked={billingMatches} onChange={(e) => setBillingMatches(e.target.checked)} />
-            <span>
-              Billing address matches shipping address
-              <br />
-              <strong>{order.shippingAddress}</strong>
-            </span>
-          </label>
+          <div className="pay-delivery">
+            <span className="eyebrow">Delivering to</span>
+            <strong>{order.customer.name}</strong>
+            <span className="muted">{order.shippingAddress}</span>
+          </div>
 
           {submitError && <p className="form-error">{submitError}</p>}
 
           <button type="submit" className="btn btn--primary btn--block pay-submit" disabled={submitting}>
             <Icon name="lock" size={16} />
-            {submitting ? "Processing…" : `Pay now — ${formatPrice(order.total)}`}
+            {submitting ? "Redirecting…" : `Pay now — ${formatPrice(order.total)}`}
           </button>
           <p className="pay-secure muted">
             <Icon name="shield" size={14} /> Encrypted connection · Card details are never stored by H&amp;A

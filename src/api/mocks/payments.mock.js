@@ -1,11 +1,13 @@
-// Mock payment flow, used until the shared payment API (Members 1 and 2) is merged.
-// The shapes below are a proposal for the initiate / status contract.
+// Mock payment flow, used while VITE_USE_MOCKS is on.
+// Shapes follow the agreed contract (ha-clothing-backend/docs/payment-api-contract.md).
 import { PAYMENT_STATUS } from "../../utils/constants";
 
 export const MOCK_ORDER = {
   id: "HA-94281",
+  status: "pending_payment",
   customer: { name: "Elena Perera", email: "elena@example.com" },
   shippingAddress: "12 Flower Road, Colombo 07, Sri Lanka",
+  deliveryMethod: "standard",
   items: [
     { id: 1, name: "Tailored A-Line Midi Dress", collection: "Silk Capsule", color: "Lilac Mist", size: "S", quantity: 1, unitPrice: 185 },
     { id: 2, name: "Contrast Binding Fitted Top", collection: "Separates", color: "Obsidian", size: "M", quantity: 1, unitPrice: 112 },
@@ -15,6 +17,7 @@ export const MOCK_ORDER = {
   shippingFee: 0,
   tax: 50,
   total: 322,
+  currency: "USD",
   estimatedDelivery: { from: "2026-10-29", to: "2026-11-01" },
 };
 
@@ -54,4 +57,12 @@ export function mockStatus(reference) {
     failureReason: "Card authorisation declined by the issuing bank (3D Secure incomplete or insufficient funds).",
   };
   return { ...payment, order: MOCK_ORDER };
+}
+
+export function mockCancel(reference) {
+  const payment = payments.get(reference);
+  if (payment?.status === PAYMENT_STATUS.PENDING) {
+    payments.set(reference, { ...payment, status: PAYMENT_STATUS.CANCELLED, failureReason: "Cancelled on the Stripe payment page." });
+  }
+  return mockStatus(reference);
 }

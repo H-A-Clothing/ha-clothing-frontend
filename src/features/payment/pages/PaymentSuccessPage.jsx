@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import Icon from "../../../components/Icon";
 import { CheckoutSteps } from "../../../components/layout/CheckoutLayout";
+import { useCart } from "../../../context/CartContext";
 import { PAYMENT_STATUS } from "../../../utils/constants";
 import { formatDate } from "../../../utils/formatters";
 import { OrderItems, OrderTotals } from "../components/OrderSummary";
@@ -15,6 +16,13 @@ export default function PaymentSuccessPage() {
   const reference = searchParams.get("ref");
   const { payment, loading, error } = usePaymentStatus(reference);
   const [copied, setCopied] = useState(false);
+  const { items, clear } = useCart();
+  const succeeded = payment?.status === PAYMENT_STATUS.SUCCEEDED;
+
+  // Empty the bag only once the payment is confirmed, so a failed payment can be retried (agreed with Member 2).
+  useEffect(() => {
+    if (succeeded && items.length > 0) clear();
+  }, [succeeded, items.length, clear]);
 
   if (loading) {
     return (
@@ -34,7 +42,7 @@ export default function PaymentSuccessPage() {
     );
   }
 
-  if (payment.status === PAYMENT_STATUS.FAILED) {
+  if (payment.status === PAYMENT_STATUS.FAILED || payment.status === PAYMENT_STATUS.CANCELLED) {
     return <Navigate to={`/payment/failure?ref=${encodeURIComponent(reference)}`} replace />;
   }
 
