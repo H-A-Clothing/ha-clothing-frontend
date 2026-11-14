@@ -1,0 +1,38 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      # No lint or test scripts exist on the current main scaffold.
+      # These steps run automatically when those scripts are added.
+      - name: Run lint if configured
+        run: npm run lint --if-present
+      - name: Run tests if configured
+        run: npm run test --if-present
+        env:
+          CI: 'true'
+      - name: Build application
+        run: npm run build
