@@ -1,7 +1,7 @@
 import { SIZES } from "../../../utils/constants";
 import { formatPrice } from "../../../utils/formatters";
 
-const PRICE_CHIPS = [100, 150, 200];
+const PRICE_CHIPS = [10000, 15000, 20000];
 
 function FilterSection({ title, action, children }) {
   return (
@@ -110,9 +110,9 @@ export default function FilterSidebar({
         <input
           type="range"
           className="range"
-          min={50}
+          min={5000}
           max={priceMax}
-          step={10}
+          step={500}
           value={currentMax}
           onChange={(event) => {
             const value = Number(event.target.value);
@@ -127,7 +127,7 @@ export default function FilterSidebar({
               className={`chip${filters.maxPrice === value ? " is-selected" : ""}`}
               onClick={() => onSetFilter("maxPrice", filters.maxPrice === value ? undefined : value)}
             >
-              Under {formatPrice(value).replace(".00", "")}
+              Under {formatPrice(value)}
             </button>
           ))}
         </div>

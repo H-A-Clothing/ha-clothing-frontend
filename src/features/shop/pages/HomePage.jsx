@@ -16,7 +16,7 @@ const EDIT_TABS = [
 
 const VALUES = [
   { icon: "scissors", title: "Ethical Craftsmanship", text: "Each piece is cut and finished in small batches." },
-  { icon: "truck", title: "Express Courier", text: "Complimentary delivery on orders over $150." },
+  { icon: "truck", title: "Express Courier", text: "Complimentary delivery on orders over Rs 15,000." },
   { icon: "leaf", title: "Conscious Packaging", text: "Plastic-free, reusable garment boxes." },
 ];
 

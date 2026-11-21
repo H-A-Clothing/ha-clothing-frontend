@@ -3,7 +3,9 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localho
 export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== "false";
 
 export const STORE_NAME = "H&A Clothing";
-export const CURRENCY = "USD";
+// Sri Lankan business: all prices, orders and payments are in Sri Lankan rupees.
+export const CURRENCY = "LKR";
+export const CURRENCY_SYMBOL = "Rs";
 
 export const SIZES = ["XS", "S", "M", "L", "XL"];
 

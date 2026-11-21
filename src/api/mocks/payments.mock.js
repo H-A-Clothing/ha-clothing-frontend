@@ -9,15 +9,15 @@ export const MOCK_ORDER = {
   shippingAddress: "12 Flower Road, Colombo 07, Sri Lanka",
   deliveryMethod: "standard",
   items: [
-    { id: 1, name: "Tailored A-Line Midi Dress", collection: "Silk Capsule", color: "Lilac Mist", size: "S", quantity: 1, unitPrice: 185 },
-    { id: 2, name: "Contrast Binding Fitted Top", collection: "Separates", color: "Obsidian", size: "M", quantity: 1, unitPrice: 112 },
+    { id: 1, name: "Tailored A-Line Midi Dress", collection: "Silk Capsule", color: "Lilac Mist", size: "S", quantity: 1, unitPrice: 18500 },
+    { id: 2, name: "Contrast Binding Fitted Top", collection: "Separates", color: "Obsidian", size: "M", quantity: 1, unitPrice: 11200 },
   ],
-  subtotal: 297,
-  discount: { code: "SPRING25", amount: 25 },
+  subtotal: 29700,
+  discount: { code: "SPRING25", amount: 2500 },
   shippingFee: 0,
-  tax: 50,
-  total: 322,
-  currency: "USD",
+  tax: 5000,
+  total: 32200,
+  currency: "LKR",
   estimatedDelivery: { from: "2026-10-29", to: "2026-11-01" },
 };
 
