@@ -24,6 +24,17 @@ function dateRange(period) {
   return { from: asInputDate(from), to: asInputDate(to) };
 }
 
+const standardCategoryFilters = [
+  { label: "Marketing", names: ["marketing"] },
+  { label: "Product Purchase", names: ["product purchase", "product purchases"] },
+  { label: "Packaging", names: ["packaging"] },
+  { label: "Other", names: ["other"] },
+  { label: "Rent", names: ["rent"] },
+  { label: "Transport", names: ["transport"] },
+  { label: "Utilities", names: ["utilities"] },
+];
+const standardCategoryNames = new Set(standardCategoryFilters.flatMap(({ names }) => names));
+
 export default function ExpensePage() {
   const [period, setPeriod] = useState("Monthly");
   const [categoryId, setCategoryId] = useState("");
@@ -32,32 +43,32 @@ export default function ExpensePage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [otherExpanded, setOtherExpanded] = useState(false);
-
   const categoryNamed = (names) => categories.find((category) => names.includes(category.name.trim().toLowerCase()));
-  const primaryCategories = [
-    { label: "Marketing", category: categoryNamed(["marketing"]) },
-    { label: "Product Purchase", category: categoryNamed(["product purchase", "product purchases"]) },
-    { label: "Packaging", category: categoryNamed(["packaging"]) },
-  ];
-  const primaryCategoryIds = new Set(primaryCategories.flatMap(({ category }) => category ? [String(category.id)] : []));
-  const otherCategories = categories.filter((category) => !primaryCategoryIds.has(String(category.id)));
+  const categoryFilters = standardCategoryFilters.map(({ label, names }) => ({ label, category: categoryNamed(names) }));
+  const customCategories = categories.filter((category) => !standardCategoryNames.has(category.name.trim().toLowerCase()));
 
   const range = useMemo(() => dateRange(period), [period]);
   useEffect(() => {
     let current = true;
     setLoading(true);
-    Promise.all([listExpenses({ ...range, categoryId: categoryId || undefined, search: query || undefined, page: 1, limit: 100 }), listExpenseCategories()])
-      .then(([expensesResponse, categoryResponse]) => {
+    listExpenses({ ...range, categoryId: categoryId || undefined, search: query || undefined, page: 1, limit: 100 })
+      .then((expensesResponse) => {
         if (!current) return;
         setResult(expensesResponse);
-        setCategories(categoryResponse.data);
         setError("");
       })
       .catch((requestError) => { if (current) setError(requestError.message || "Could not load expenses."); })
       .finally(() => { if (current) setLoading(false); });
     return () => { current = false; };
   }, [range, categoryId, query]);
+
+  useEffect(() => {
+    let current = true;
+    listExpenseCategories()
+      .then((response) => { if (current) setCategories(response.data); })
+      .catch((requestError) => { if (current) setError(requestError.message || "Could not load expense categories."); });
+    return () => { current = false; };
+  }, []);
 
   const exportCsv = () => {
     const rows = [["Date", "Reference / voucher number", "Category", "Beneficiary", "Description", "Payment method", "Amount (LKR)"], ...result.data.map((expense) => [expense.expense_date, expense.reference_no, expense.category_name, expense.beneficiary, expense.description ?? "", expense.payment_method, expense.amount])];
@@ -88,13 +99,10 @@ export default function ExpensePage() {
       <div className="reference-ledger-heading">
         <div><h2>Expense ledger</h2><p>Recorded expenses for the selected period</p></div>
         <div className="ledger-actions">
-          <div className="expense-category-filters">
-            <div className="ledger-categories" aria-label="Filter by category">
+          <div className="ledger-categories" aria-label="Filter by category">
               <button type="button" className={!categoryId ? "is-selected" : ""} aria-pressed={!categoryId} onClick={() => setCategoryId("")}>All categories</button>
-              {primaryCategories.map(({ label, category }) => <button type="button" className={category && String(categoryId) === String(category.id) ? "is-selected" : ""} aria-pressed={Boolean(category && String(categoryId) === String(category.id))} onClick={() => category && setCategoryId(String(category.id))} disabled={!category} key={label}>{label}</button>)}
-              <button type="button" className={otherExpanded || otherCategories.some((category) => String(category.id) === String(categoryId)) ? "is-selected" : ""} aria-expanded={otherExpanded} onClick={() => { if (!otherExpanded) setCategoryId(""); setOtherExpanded((expanded) => !expanded); }}>Other <Icon name="chevronDown" size={12}/></button>
-            </div>
-            {otherExpanded && <div className="ledger-categories ledger-subcategories" aria-label="Other expense categories">{otherCategories.map((category) => <button type="button" className={String(categoryId) === String(category.id) ? "is-selected" : ""} aria-pressed={String(categoryId) === String(category.id)} onClick={() => setCategoryId(String(category.id))} key={category.id}>{category.name}</button>)}</div>}
+              {categoryFilters.map(({ label, category }) => <button type="button" className={category && String(categoryId) === String(category.id) ? "is-selected" : ""} aria-pressed={Boolean(category && String(categoryId) === String(category.id))} onClick={() => category && setCategoryId(String(category.id))} disabled={!category} key={label}>{label}</button>)}
+              {customCategories.map((category) => <button type="button" className={String(categoryId) === String(category.id) ? "is-selected" : ""} aria-pressed={String(categoryId) === String(category.id)} onClick={() => setCategoryId(String(category.id))} key={category.id}>{category.name}</button>)}
           </div>
           <Link to="/admin/finance/expenses/categories" className="expense-button record-button"><Icon name="plus" size={15}/> Add expense categories</Link>
           <Link to="/admin/finance/expenses/new" className="expense-button record-button"><Icon name="plus" size={15}/> Add expense</Link>

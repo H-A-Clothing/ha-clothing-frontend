@@ -273,11 +273,9 @@
 .reference-ledger-heading h2 { color: #21172b; font-family: var(--font-serif); font-size: 21px; font-weight: 400; }
 .reference-ledger-heading p { max-width: 360px; margin-top: 3px; color: #82798d; font-size: 11px; line-height: 1.4; }
 .ledger-actions { display: grid; justify-items: start; gap: 5px; }
-.expense-content .expense-category-filters { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 4px; }
 .ledger-categories { display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 9px; background: #f2eafb; }
 .ledger-categories button { min-height: 27px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; color: #766c82; font-size: 10px; cursor: pointer; }
 .ledger-categories button:disabled { opacity: .5; cursor: not-allowed; }
-.expense-content .ledger-subcategories { max-width: min(550px, 100%); background: #faf7fd; }
 .ledger-categories button.is-selected { background: #fff; color: #342842; box-shadow: 0 1px 4px rgba(48,32,69,.08); }
 .ledger-actions .record-button { min-height: 34px; min-width: 160px; padding: 0 12px; border-radius: 7px; background: #8158bd; box-shadow: none; font-size: 11px; }
 .ledger-actions .record-button:hover { background: #7049ac; }
@@ -427,7 +425,7 @@
 .expense-view-button { display: inline-flex; align-items: center; justify-content: center; min-width: 52px; min-height: 31px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; color: var(--color-ink); font-size: 11px; font-weight: 700; transition: border-color .16s ease, background-color .16s ease; }
 .expense-view-button:hover { border-color: var(--color-accent); background: #f7f2fc; }
 .expense-content .ledger-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
-.expense-content .ledger-categories { max-width: min(550px, 100%); overflow-x: auto; }
+.expense-content .ledger-categories { width: max-content; max-width: 100%; overflow-x: auto; }
 .expense-content .ledger-categories button { flex: 0 0 auto; }
 .expense-content .ledger-actions .expense-button { min-width: 0; min-height: 38px; padding: 0 12px; font-size: 10px; }
 .expense-content .ledger-actions .record-button { color: #fff; }
