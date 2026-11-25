@@ -1,104 +1,66 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Icon from "../../../components/Icon";
-import "../finance.css";
+import { listExpenses, listExpenseCategories } from "../../../api/finance";
 
-const seedExpenses = [
-  { date: "2026-11-24", category: "Product purchases", description: "New arrivals: tops and frocks", reference: "EXP-2026-1141", vendor: "Colombo Wholesale Market", payment: "Bank transfer", amount: 148500, status: "Active" },
-  { date: "2026-11-20", category: "Marketing", description: "Instagram product promotion", reference: "EXP-2026-1138", vendor: "Meta Ads", payment: "Card", amount: 35000, status: "Active" },
-  { date: "2026-11-17", category: "Transport", description: "Collection and stock transport", reference: "EXP-2026-1125", vendor: "Local transport", payment: "Cash", amount: 12500, status: "Active" },
-  { date: "2026-11-12", category: "Packaging", description: "Customer order packaging", reference: "EXP-2026-1119", vendor: "Pack & Post Lanka", payment: "Bank transfer", amount: 8400, status: "Active" },
-  { date: "2026-10-29", category: "Marketing", description: "Facebook page promotion", reference: "EXP-2026-1074", vendor: "Meta Ads", payment: "Card", amount: 21000, status: "Voided" },
-];
-
-const categoryGroups = [
-  ["All categories", null],
-  ["Product purchases", "Product purchases"],
-  ["Marketing", "Marketing"],
-  ["Operations", "Operations"],
-];
-const operationCategories = ["Transport", "Packaging", "Rent", "Utilities", "Other"];
-const fmt = (amount) => new Intl.NumberFormat("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
-const inSelectedPeriod = (date, period) => {
-  if (period === "Weekly") return date >= "2026-11-23" && date <= "2026-11-29";
-  if (period === "Monthly") return date.startsWith("2026-11");
-  return date >= "2026-10-01" && date <= "2026-12-31";
-};
-
-function ExpenseForm({ onSave, onClose }) {
-  const [form, setForm] = useState({ category: "Product purchases", date: new Date().toISOString().slice(0, 10), description: "", amount: "", payment: "Bank transfer", reference: "", notes: "" });
-  const [error, setError] = useState("");
-  const update = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
-  const submit = (event) => {
-    event.preventDefault();
-    if (!form.description.trim() || !form.reference.trim() || Number(form.amount) <= 0) {
-      setError("Enter a description, reference number, and an amount greater than zero.");
-      return;
-    }
-    onSave({ ...form, vendor: form.vendor || form.description, amount: Number(form.amount), status: "Active" });
-  };
-
-  return <div className="expense-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-    <section className="expense-modal" role="dialog" aria-modal="true" aria-labelledby="expense-form-title">
-      <div className="modal-accent"/><div className="expense-modal-inner">
-        <div className="modal-heading"><div><span className="modal-eyebrow">H&amp;A financial ledger</span><h2 id="expense-form-title">Record expense</h2></div><button className="icon-button" type="button" onClick={onClose} aria-label="Close"><Icon name="close" size={19}/></button></div>
-        <form onSubmit={submit}>
-          <div className="form-grid">
-            <label className="expense-field"><span>Category <b>*</b></span><select name="category" value={form.category} onChange={update}>{["Product purchases", "Marketing", ...operationCategories].map((category) => <option key={category}>{category}</option>)}</select></label>
-            <label className="expense-field"><span>Date <b>*</b></span><input name="date" type="date" value={form.date} onChange={update} required/></label>
-            <label className="expense-field field-full"><span>Description <b>*</b></span><input name="description" value={form.description} onChange={update} required placeholder="What was this expense for?"/></label>
-            <label className="expense-field"><span>Amount (LKR) <b>*</b></span><div className="amount-input"><span>Rs.</span><input name="amount" type="number" min="0.01" step="0.01" value={form.amount} onChange={update} required placeholder="0.00"/></div></label>
-            <label className="expense-field"><span>Payment method <b>*</b></span><select name="payment" value={form.payment} onChange={update}>{["Bank transfer", "Cash", "Card", "Cheque"].map((method) => <option key={method}>{method}</option>)}</select></label>
-            <label className="expense-field field-full"><span>Reference / invoice number <b>*</b></span><input name="reference" value={form.reference} onChange={update} required placeholder="e.g. INV-2026-001"/></label>
-            <label className="expense-field field-full"><span>Notes</span><textarea name="notes" value={form.notes} onChange={update} placeholder="Optional details"/></label>
-          </div>
-          {error && <p className="expense-form-error" role="alert">{error}</p>}
-          <div className="expense-form-actions"><button className="expense-button cancel-button" type="button" onClick={onClose}>Cancel</button><button className="expense-button save-button" type="submit"><Icon name="check" size={14}/> Save expense</button></div>
-        </form>
-      </div>
-    </section>
-  </div>;
+function localDate(value) {
+  const date = new Date(value);
+  return new Intl.DateTimeFormat("en-LK", { day: "2-digit", month: "short", year: "numeric" }).format(date);
 }
 
-export default function ExpensePage({ mode = "list" }) {
-  const navigate = useNavigate();
-  const [expenses, setExpenses] = useState(() => { try { return JSON.parse(localStorage.getItem("ha-finance-expenses-v2")) || seedExpenses; } catch { return seedExpenses; } });
-  const [category, setCategory] = useState(null);
+function dateRange(period) {
+  const today = new Date();
+  const to = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  let from;
+  if (period === "Weekly") {
+    from = new Date(to);
+    from.setDate(from.getDate() - ((from.getDay() + 6) % 7));
+  } else if (period === "Quarterly") {
+    from = new Date(to.getFullYear(), Math.floor(to.getMonth() / 3) * 3, 1);
+  } else {
+    from = new Date(to.getFullYear(), to.getMonth(), 1);
+  }
+  const asInputDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return { from: asInputDate(from), to: asInputDate(to) };
+}
+
+export default function ExpensePage() {
   const [period, setPeriod] = useState("Monthly");
+  const [categoryId, setCategoryId] = useState("");
   const [query, setQuery] = useState("");
-  const [notice, setNotice] = useState("");
-  const [selectedExpense, setSelectedExpense] = useState(null);
-  const isForm = mode === "new";
+  const [result, setResult] = useState({ data: [], meta: { total: 0, totalAmount: 0 } });
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [otherExpanded, setOtherExpanded] = useState(false);
 
+  const categoryNamed = (names) => categories.find((category) => names.includes(category.name.trim().toLowerCase()));
+  const primaryCategories = [
+    { label: "Marketing", category: categoryNamed(["marketing"]) },
+    { label: "Product Purchase", category: categoryNamed(["product purchase", "product purchases"]) },
+    { label: "Packaging", category: categoryNamed(["packaging"]) },
+  ];
+  const primaryCategoryIds = new Set(primaryCategories.flatMap(({ category }) => category ? [String(category.id)] : []));
+  const otherCategories = categories.filter((category) => !primaryCategoryIds.has(String(category.id)));
+
+  const range = useMemo(() => dateRange(period), [period]);
   useEffect(() => {
-    const previousTitle = document.title;
-    document.title = isForm ? "Record Expense | H&A Finance" : "Expense Management | H&A Finance";
-    return () => { document.title = previousTitle; };
-  }, [isForm]);
-
-  const filteredExpenses = useMemo(() => expenses.filter((expense) => {
-    const matchesCategory = !category || (category === "Operations" ? operationCategories.includes(expense.category) : expense.category === category);
-    const matchesPeriod = inSelectedPeriod(expense.date, period);
-    const matchesQuery = !query || `${expense.description} ${expense.vendor} ${expense.reference} ${expense.category}`.toLowerCase().includes(query.toLowerCase());
-    return matchesCategory && matchesPeriod && matchesQuery;
-  }), [expenses, category, period, query]);
-  const activeExpenses = filteredExpenses.filter((expense) => expense.status === "Active");
-  const activeTotal = activeExpenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
-  const averageExpense = activeExpenses.length ? activeTotal / activeExpenses.length : 0;
-  const purchasesTotal = activeExpenses.filter((expense) => expense.category === "Product purchases").reduce((sum, expense) => sum + Number(expense.amount), 0);
-  const purchaseShare = activeTotal ? Math.round(purchasesTotal / activeTotal * 100) : 0;
-  const voidedCount = filteredExpenses.filter((expense) => expense.status === "Voided").length;
-
-  const saveExpense = (expense) => {
-    const updated = [expense, ...expenses];
-    setExpenses(updated);
-    try { localStorage.setItem("ha-finance-expenses-v2", JSON.stringify(updated)); } catch { /* The current view still updates if storage is unavailable. */ }
-    setNotice("Expense recorded successfully.");
-    navigate("/admin/finance/expenses");
-  };
+    let current = true;
+    setLoading(true);
+    Promise.all([listExpenses({ ...range, categoryId: categoryId || undefined, search: query || undefined, page: 1, limit: 100 }), listExpenseCategories()])
+      .then(([expensesResponse, categoryResponse]) => {
+        if (!current) return;
+        setResult(expensesResponse);
+        setCategories(categoryResponse.data);
+        setError("");
+      })
+      .catch((requestError) => { if (current) setError(requestError.message || "Could not load expenses."); })
+      .finally(() => { if (current) setLoading(false); });
+    return () => { current = false; };
+  }, [range, categoryId, query]);
 
   const exportCsv = () => {
-    const rows = [["Date", "Reference", "Category", "Vendor", "Description", "Method", "Amount (LKR)", "Status"], ...filteredExpenses.map((item) => [item.date, item.reference, item.category, item.vendor, item.description, item.payment, item.amount, item.status])];
+    const rows = [["Date", "Reference / voucher number", "Category", "Beneficiary", "Description", "Payment method", "Amount (LKR)"], ...result.data.map((expense) => [expense.expense_date, expense.reference_no, expense.category_name, expense.beneficiary, expense.description ?? "", expense.payment_method, expense.amount])];
     const csv = rows.map((row) => row.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\r\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const anchor = document.createElement("a"); anchor.href = url; anchor.download = "ha-expense-ledger.csv"; anchor.click(); URL.revokeObjectURL(url);
@@ -107,45 +69,51 @@ export default function ExpensePage({ mode = "list" }) {
   return <div className="expense-content reference-expense-page">
     <div className="reference-heading">
       <div className="reference-title-block">
-        <div className="reference-eyebrow"><span>H&amp;A · Finance</span><i/> Expense ledger <b>·</b> LKR
-        </div>
+        <div className="reference-eyebrow"><span>H&amp;A · Finance</span><i/> Expense ledger <b>·</b> LKR</div>
         <h1>Expense <em>Management</em></h1>
         <p>Track product purchases, marketing, and day-to-day operating expenses in one place.</p>
       </div>
       <div className="reference-heading-actions">
-        <div className="period-control" aria-label="Filter expenses by period">{["Weekly", "Monthly", "Quarterly"].map((value) => <button type="button" aria-pressed={period === value} className={period === value ? "is-selected" : ""} onClick={() => setPeriod(value)} key={value}>{value === "Quarterly" ? "Q4 2026" : value}</button>)}</div>
-        <button type="button" className="expense-button export-button" onClick={exportCsv}><Icon name="arrowUpRight" size={14}/> Export CSV</button>
+        <div className="period-control" aria-label="Filter expenses by period">{["Weekly", "Monthly", "Quarterly"].map((value) => <button type="button" aria-pressed={period === value} className={period === value ? "is-selected" : ""} onClick={() => setPeriod(value)} key={value}>{value === "Quarterly" ? `Q${Math.floor(new Date().getMonth() / 3) + 1}` : value}</button>)}</div>
+        <button type="button" className="expense-button export-button" onClick={exportCsv} disabled={!result.data.length}><Icon name="arrowUpRight" size={14}/> Export CSV</button>
       </div>
     </div>
-    {notice && <p className="expense-notice" role="status">{notice}</p>}
     <section className="expense-kpis" aria-label="Expense summary">
-      <article className="expense-kpi"><div className="kpi-label">Total expenses <Icon name="bag" size={15}/></div><strong>Rs. {fmt(activeTotal)} <small>LKR</small></strong><small><i>{period === "Quarterly" ? "Q4 2026" : period}</i> Active expenses</small></article>
-      <article className="expense-kpi"><div className="kpi-label">Average expense <Icon name="file" size={15}/></div><strong>Rs. {fmt(averageExpense)}</strong><small><i>{activeExpenses.length} records</i> In this period</small></article>
-      <article className="expense-kpi"><div className="kpi-label">Product purchases <Icon name="bag" size={15}/></div><strong>{purchaseShare}% <small>of total</small></strong><small><b className="kpi-dot"/> Stock and product sourcing</small></article>
-      <article className="expense-kpi"><div className="kpi-label">Ledger status <Icon name="shield" size={15}/></div><strong>{filteredExpenses.length} <small>records</small></strong><small><i className="kpi-dark-pill">{voidedCount} voided</i> Retained for audit</small></article>
+      <article className="expense-kpi"><div className="kpi-label">Expenses in period <Icon name="bag" size={15}/></div><strong>Rs. {Number(result.meta.totalAmount || 0).toLocaleString("en-LK", { minimumFractionDigits: 2 })} <small>LKR</small></strong><small><i>{period}</i> Total recorded expenses</small></article>
+      <article className="expense-kpi"><div className="kpi-label">Expense records <Icon name="file" size={15}/></div><strong>{result.meta.total || 0} <small>records</small></strong><small><i>{result.data.length} shown</i> Matching filters</small></article>
+      <article className="expense-kpi"><div className="kpi-label">Expense categories <Icon name="grid" size={15}/></div><strong>{categories.length} <small>active</small></strong><small><b className="kpi-dot"/> Available for recording</small></article>
+      <article className="expense-kpi"><div className="kpi-label">Selected period <Icon name="file" size={15}/></div><strong>{localDate(`${range.from}T12:00:00`)}</strong><small><i>Through today</i> {localDate(`${range.to}T12:00:00`)}</small></article>
     </section>
     <section className="expense-journal reference-ledger">
       <div className="reference-ledger-heading">
-        <div><h2>Expense ledger</h2><p>Recorded business expenses for the selected period</p></div>
+        <div><h2>Expense ledger</h2><p>Recorded expenses for the selected period</p></div>
         <div className="ledger-actions">
-          <div className="ledger-categories" aria-label="Filter by category">{categoryGroups.map(([value, label]) => <button type="button" aria-pressed={(category || "All categories") === (value || "All categories")} className={(category || "All categories") === (value || "All categories") ? "is-selected" : ""} onClick={() => setCategory(value)} key={label || value}>{value || label}</button>)}</div>
-          <Link to="/admin/finance/expenses/new" className="expense-button record-button"><Icon name="plus" size={15}/> Record expense</Link>
+          <div className="expense-category-filters">
+            <div className="ledger-categories" aria-label="Filter by category">
+              <button type="button" className={!categoryId ? "is-selected" : ""} aria-pressed={!categoryId} onClick={() => setCategoryId("")}>All categories</button>
+              {primaryCategories.map(({ label, category }) => <button type="button" className={category && String(categoryId) === String(category.id) ? "is-selected" : ""} aria-pressed={Boolean(category && String(categoryId) === String(category.id))} onClick={() => category && setCategoryId(String(category.id))} disabled={!category} key={label}>{label}</button>)}
+              <button type="button" className={otherExpanded || otherCategories.some((category) => String(category.id) === String(categoryId)) ? "is-selected" : ""} aria-expanded={otherExpanded} onClick={() => { if (!otherExpanded) setCategoryId(""); setOtherExpanded((expanded) => !expanded); }}>Other <Icon name="chevronDown" size={12}/></button>
+            </div>
+            {otherExpanded && <div className="ledger-categories ledger-subcategories" aria-label="Other expense categories">{otherCategories.map((category) => <button type="button" className={String(categoryId) === String(category.id) ? "is-selected" : ""} aria-pressed={String(categoryId) === String(category.id)} onClick={() => setCategoryId(String(category.id))} key={category.id}>{category.name}</button>)}</div>}
+          </div>
+          <Link to="/admin/finance/expenses/categories" className="expense-button record-button"><Icon name="plus" size={15}/> Add expense categories</Link>
+          <Link to="/admin/finance/expenses/new" className="expense-button record-button"><Icon name="plus" size={15}/> Add expense</Link>
         </div>
       </div>
-      <div className="ledger-tools"><label className="ledger-search"><Icon name="search" size={15}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search reference, vendor, or category" aria-label="Search expenses"/></label><span>{period === "Quarterly" ? "1 Oct – 31 Dec 2026" : period === "Monthly" ? "November 2026" : "23 – 29 Nov 2026"}</span></div>
+      <div className="ledger-tools"><label className="ledger-search"><Icon name="search" size={15}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search reference, beneficiary, or category" aria-label="Search expenses"/></label><span>{localDate(`${range.from}T12:00:00`)} – {localDate(`${range.to}T12:00:00`)}</span></div>
       <div className="ledger-rule"/>
-      <div className="expense-table-wrap"><table className="expense-table reference-table"><thead><tr><th>Date</th><th>Reference / voucher</th><th>Category</th><th>Vendor / beneficiary</th><th>Method</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>{filteredExpenses.map((expense) => <tr key={expense.reference}>
-        <td className="expense-date">{new Date(`${expense.date}T12:00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</td>
-        <td className="voucher-cell">{expense.reference}</td><td><span className="expense-category-tag">{expense.category}</span></td>
-        <td><strong className="vendor-name">{expense.vendor}</strong><small className="expense-reference">{expense.description}</small></td>
-        <td className="payment-method">{expense.payment}</td><td className="expense-amount">Rs. {fmt(expense.amount)}</td>
-        <td><span className={`expense-status${expense.status === "Voided" ? " is-voided" : ""}`}><i/>{expense.status}</span></td>
-        <td><button type="button" className="row-action" aria-label={`View ${expense.reference} details`} title="View expense details" onClick={() => setSelectedExpense(expense)}>⋮</button></td>
-      </tr>)}</tbody></table>{filteredExpenses.length === 0 && <div className="expense-empty">No expenses match these filters.</div>}</div>
-      <div className="journal-footer"><span>Showing {filteredExpenses.length} of {expenses.length} expense records · {period === "Quarterly" ? "Q4 2026" : period}</span><span className="ledger-voided-note">{voidedCount} voided record{voidedCount === 1 ? "" : "s"} retained in the ledger</span></div>
+      {error && <div className="expense-error" role="alert">{error}</div>}
+      <div className="expense-table-wrap"><table className="expense-table reference-table"><thead><tr><th>Date</th><th>Reference / voucher</th><th>Category</th><th>Beneficiary</th><th>Payment method</th><th>Amount</th><th>Action</th></tr></thead><tbody>{result.data.map((expense) => <tr key={expense.id}>
+        <td className="expense-date">{localDate(`${expense.expense_date}T12:00:00`)}</td>
+        <td className="voucher-cell">{expense.reference_no}</td>
+        <td><span className="expense-category-tag">{expense.category_name}</span></td>
+        <td><strong className="vendor-name">{expense.beneficiary}</strong>{expense.description && <small className="expense-reference">{expense.description}</small>}</td>
+        <td className="payment-method">{expense.payment_method}</td>
+        <td className="expense-amount">Rs. {Number(expense.amount).toLocaleString("en-LK", { minimumFractionDigits: 2 })}</td>
+        <td><Link to={`/admin/finance/expenses/${expense.id}`} className="expense-view-button">View</Link></td>
+      </tr>)}</tbody></table>{loading && <div className="expense-empty">Loading expenses…</div>}{!loading && !error && !result.data.length && <div className="expense-empty">No expenses match this period and filters.</div>}</div>
+      <div className="journal-footer"><span>Showing {result.data.length} of {result.meta.total || 0} expense records</span><span>Amounts in Sri Lankan rupees (LKR)</span></div>
     </section>
-    <footer className="expense-footer"><span>H&amp;A Clothing · Finance</span><span>Amounts shown in Sri Lankan rupees (LKR)</span></footer>
-    {isForm && <ExpenseForm onSave={saveExpense} onClose={() => navigate("/admin/finance/expenses")}/>}
-    {selectedExpense && <div className="expense-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedExpense(null); }}><section className="expense-modal expense-detail-modal" role="dialog" aria-modal="true" aria-labelledby="expense-detail-title"><div className="modal-accent"/><div className="expense-modal-inner"><div className="modal-heading"><div><span className="modal-eyebrow">Expense details</span><h2 id="expense-detail-title">{selectedExpense.reference}</h2></div><button className="icon-button" type="button" onClick={() => setSelectedExpense(null)} aria-label="Close"><Icon name="close" size={19}/></button></div><dl className="expense-detail-grid"><div><dt>Date</dt><dd>{new Date(`${selectedExpense.date}T12:00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}</dd></div><div><dt>Category</dt><dd>{selectedExpense.category}</dd></div><div><dt>Vendor / beneficiary</dt><dd>{selectedExpense.vendor}</dd></div><div><dt>Payment method</dt><dd>{selectedExpense.payment}</dd></div><div><dt>Amount</dt><dd>Rs. {fmt(selectedExpense.amount)} LKR</dd></div><div><dt>Status</dt><dd>{selectedExpense.status}</dd></div><div className="detail-full"><dt>Description</dt><dd>{selectedExpense.description}</dd></div></dl></div></section></div>}
+    <footer className="expense-footer"><span>H&amp;A Clothing · Finance</span><span>Financial Management · Member 7</span></footer>
   </div>;
 }
