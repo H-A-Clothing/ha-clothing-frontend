@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import Icon from "../../../components/Icon";
 import { getCategories } from "../../../api/catalogue";
 import { useFetch } from "../../../hooks/useFetch";
+import AboutStatement from "../components/AboutStatement";
+import HeroSlider from "../components/HeroSlider";
 import ProductGrid from "../components/ProductGrid";
 import { useProducts } from "../hooks/useProducts";
 import "../shop.css";
@@ -16,7 +18,7 @@ const EDIT_TABS = [
 
 const VALUES = [
   { icon: "scissors", title: "Ethical Craftsmanship", text: "Each piece is cut and finished in small batches." },
-  { icon: "truck", title: "Express Courier", text: "Complimentary delivery on orders over Rs 15,000." },
+  { icon: "truck", title: "Express Courier", text: "Complimentary delivery on orders over LKR 15,000." },
   { icon: "leaf", title: "Conscious Packaging", text: "Plastic-free, reusable garment boxes." },
 ];
 
@@ -27,49 +29,7 @@ export default function HomePage() {
 
   return (
     <div className="home">
-      <section className="hero">
-        <div className="container hero__inner">
-          <div className="hero__copy">
-            <div className="hero__tags">
-              <span className="tag tag--dark">Edition 2026</span>
-              <span className="tag">Limited run</span>
-            </div>
-            <span className="eyebrow">The Spring Muse Collection</span>
-            <h1 className="hero__title">
-              Effortless Silhouettes, <em>Tailored Grace.</em>
-            </h1>
-            <p className="muted hero__text">
-              Curated contemporary essentials crafted for timeless style and subtle luxury, infused with soft
-              lavender hues, structured tailoring and delicate contrast binding.
-            </p>
-            <div className="hero__actions">
-              <Link to="/shop" className="btn btn--primary">
-                Explore Collection
-              </Link>
-              <Link to="/new-arrivals" className="btn btn--accent">
-                Shop New Arrivals
-              </Link>
-            </div>
-            <dl className="hero__stats">
-              <div>
-                <dt>100%</dt>
-                <dd className="eyebrow">Natural fibres</dd>
-              </div>
-              <div>
-                <dt>Atelier</dt>
-                <dd className="eyebrow">Hand finished</dd>
-              </div>
-              <div>
-                <dt>04</dt>
-                <dd className="eyebrow">Capsule edits</dd>
-              </div>
-            </dl>
-          </div>
-          <div className="hero__media" role="img" aria-label="Spring collection">
-            <span>H&amp;A</span>
-          </div>
-        </div>
-      </section>
+      <HeroSlider />
 
       <section className="container home-section">
         <div className="section-head">
@@ -120,6 +80,8 @@ export default function HomePage() {
         </div>
         <ProductGrid products={weekly?.items} loading={loading} columns={4} skeletonCount={4} />
       </section>
+
+      <AboutStatement />
 
       <section className="container home-section manifesto">
         <div>

@@ -127,7 +127,7 @@ function ProductDetail({ product }) {
             </Accordion>
             <Accordion title="Delivery & Returns">
               <p>
-                Complimentary courier delivery on orders over Rs 15,000. Returns and exchanges accepted within 14 days
+                Complimentary courier delivery on orders over LKR 15,000. Returns and exchanges accepted within 14 days
                 of delivery. <Link to="/returns" className="link-inline">Read the policy</Link>.
               </p>
             </Accordion>

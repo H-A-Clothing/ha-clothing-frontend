@@ -15,7 +15,7 @@ const NAV_LINKS = [
 export function AnnouncementBar() {
   return (
     <div className="announcement">
-      Complimentary courier delivery on orders over Rs 15,000 · Spring capsule now live
+      Complimentary courier delivery on orders over LKR 15,000 · Spring capsule now live
     </div>
   );
 }

@@ -568,71 +568,286 @@
 }
 
 /* ---------- Home ---------- */
-.hero {
-  padding: 56px 0;
-  background: linear-gradient(180deg, var(--color-bg-soft), var(--color-bg));
+/* Full-screen moving banner: slides fade into each other while the photo slowly zooms in. */
+.hero-slider {
+  position: relative;
+  height: calc(100vh - 120px);
+  min-height: 480px;
+  overflow: hidden;
+  background: #b8a4e3;
 }
 
-.hero__inner {
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 48px;
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.2s ease, visibility 1.2s;
+}
+
+.hero-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hero-slide__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The photo sits on top; if it is missing, the gradient underneath shows. */
+  background-image: var(--slide-image), linear-gradient(160deg, #e3d9f6, #9c86d4);
+  background-size: cover;
+  background-position: center;
+  transform: scale(1);
+}
+
+.hero-slide:nth-child(2) .hero-slide__media {
+  background-image: var(--slide-image), linear-gradient(200deg, #f1dce6, #b48aa8);
+}
+
+.hero-slide:nth-child(3) .hero-slide__media {
+  background-image: var(--slide-image), linear-gradient(140deg, #d6c6ee, #5e4a7e);
+}
+
+.hero-slide.is-active .hero-slide__media {
+  animation: hero-zoom 7s ease-out forwards;
+}
+
+/* Violet shading at the bottom so the white text stays readable. */
+.hero-slide__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(43, 30, 78, 0.6) 0%, rgba(91, 71, 150, 0.18) 55%, transparent 100%);
+}
+
+/* Lavender wash that pulls the beige photo backgrounds toward the site's violet theme. */
+.hero-slide__overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  mix-blend-mode: soft-light;
+  opacity: 0.75;
+}
+
+.hero-slide__content {
+  position: absolute;
+  inset: auto 0 96px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 14px;
+  text-align: center;
+  color: #fff;
 }
 
-.hero__tags {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 18px;
+.hero-slide__eyebrow,
+.hero-slide__title,
+.hero-slide__cta {
+  opacity: 0;
+  transform: translateY(24px);
 }
 
-.hero__title {
-  margin: 10px 0 18px;
-  font-size: clamp(2.4rem, 5vw, 3.8rem);
+.hero-slide.is-active .hero-slide__eyebrow,
+.hero-slide.is-active .hero-slide__title,
+.hero-slide.is-active .hero-slide__cta {
+  animation: hero-rise 0.9s ease-out forwards;
 }
 
-.hero__text {
-  max-width: 460px;
+.hero-slide.is-active .hero-slide__eyebrow { animation-delay: 0.4s; }
+.hero-slide.is-active .hero-slide__title { animation-delay: 0.6s; }
+.hero-slide.is-active .hero-slide__cta { animation-delay: 0.85s; }
+
+.hero-slide__eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
 }
 
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 28px 0 36px;
-}
-
-.hero__stats {
-  display: flex;
-  gap: 40px;
+.hero-slide__title {
+  max-width: 760px;
   margin: 0;
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1.1;
 }
 
-.hero__stats dt {
+.hero-slide__cta {
+  margin-top: 10px;
+  padding: 15px 44px;
+  background: #fff;
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hero-slide__cta:hover {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+.hero-slider__dots {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  display: flex;
+  gap: 10px;
+  transform: translateX(-50%);
+}
+
+.hero-slider__dot {
+  width: 28px;
+  height: 3px;
+  padding: 0;
+  border: 0;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.hero-slider__dot.is-active {
+  width: 48px;
+  background: #fff;
+}
+
+@keyframes hero-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+@keyframes hero-rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* People who turn off animations in their system settings get a still banner. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide,
+  .hero-slide.is-active .hero-slide__media,
+  .hero-slide.is-active .hero-slide__eyebrow,
+  .hero-slide.is-active .hero-slide__title,
+  .hero-slide.is-active .hero-slide__cta {
+    animation: none;
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-slide:not(.is-active) {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-slider {
+    height: 75vh;
+  }
+
+  .hero-slide__content {
+    bottom: 80px;
+    padding: 0 20px;
+  }
+}
+
+/* "About us" statement: big words over a photo that light up as you scroll. */
+.about-statement {
+  position: relative;
+  min-height: 90vh;
+  margin-top: 72px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background-color: #5b4796;
+  background-image: var(--about-image);
+  background-size: cover;
+  background-position: center 20%;
+  /* The photo stays still while the page scrolls over it (desktop only). */
+  background-attachment: fixed;
+}
+
+.about-statement__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(43, 30, 78, 0.35) 0%, rgba(43, 30, 78, 0.55) 50%, rgba(43, 30, 78, 0.35) 100%);
+}
+
+.about-statement__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding-top: 96px;
+  padding-bottom: 96px;
+  text-align: center;
+  color: #fff;
+}
+
+.about-statement__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.about-statement__eyebrow::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: #fff;
+}
+
+.about-statement__text {
+  max-width: 1100px;
+  margin: 0;
   font-family: var(--font-serif);
-  font-size: 22px;
+  font-size: clamp(1.8rem, 4.2vw, 3.4rem);
+  line-height: 1.25;
+}
+
+.about-statement__word {
+  color: rgba(255, 255, 255, 0.28);
+  transition: color 0.4s ease;
+}
+
+.about-statement__word.is-lit {
+  color: #fff;
+}
+
+.about-statement__cta {
+  margin-top: 8px;
+  padding: 15px 40px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.about-statement__cta:hover {
+  background: #fff;
   color: var(--color-ink);
 }
 
-.hero__stats dd {
-  margin: 0;
-}
-
-.hero__media {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 4 / 5;
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.8), transparent 55%),
-    linear-gradient(160deg, #e3d9f6, #b8a4e3);
-  box-shadow: var(--shadow-soft);
-}
-
-.hero__media span {
-  font-family: var(--font-serif);
-  font-size: 64px;
-  color: rgba(28, 23, 36, 0.18);
+/* Phones and tablets don't support a fixed background well, so let it scroll normally. */
+@media (max-width: 1024px), (hover: none) {
+  .about-statement {
+    min-height: 75vh;
+    background-attachment: scroll;
+  }
 }
 
 .home-section {
@@ -1017,14 +1232,9 @@
     display: none;
   }
 
-  .hero__inner,
   .pdp {
     grid-template-columns: 1fr;
     gap: 32px;
-  }
-
-  .hero__media {
-    aspect-ratio: 16 / 10;
   }
 }
 
@@ -1042,10 +1252,6 @@
 
   .manifesto__values {
     grid-template-columns: 1fr;
-  }
-
-  .hero__stats {
-    gap: 24px;
   }
 
   .wishlist-head {
