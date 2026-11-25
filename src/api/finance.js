@@ -1,4 +1,4 @@
-// Member 7: financial management and reporting APIs.
+// financial management and reporting APIs.
 import { apiClient } from "./client";
 
 export const listExpenses = (params) => apiClient.get("/expenses", params);
