@@ -331,3 +331,83 @@
 .expense-profile > svg { margin-left: auto; color: #716580; }
 @media (max-width: 920px) { .expense-sidebar { width: 190px; } .atelier-switcher { margin-right: 10px; margin-left: 10px; font-size: 8px; } }
 @media (max-width: 600px) { .expense-sidebar { width: 55px; min-width: 55px; padding-bottom: 12px; }.expense-brand { justify-content: center; padding: 0; }.expense-brand > div:last-child, .atelier-switcher, .expense-nav-label, .expense-nav-item span, .expense-profile { display: none; }.expense-nav { gap: 8px; padding: 12px 6px; }.expense-nav-item { justify-content: center; padding: 0; }.expense-nav-item.is-active svg { margin-left: 0; } }
+
+/* Expense management page: responsive editorial layout using the shared palette and type tokens. */
+.finance-app { --finance-sidebar-width: clamp(248px, 20vw, 320px); --finance-lilac: var(--color-accent-strong); }
+.expense-sidebar { width: var(--finance-sidebar-width); }
+.expense-workspace { width: calc(100% - var(--finance-sidebar-width)); margin-left: var(--finance-sidebar-width); }
+.expense-workspace .expense-topbar { height: 76px; min-height: 76px; padding: 0 clamp(24px, 3vw, 42px); background: #fff; }
+.top-crumb { display: flex; align-items: center; gap: 11px; color: var(--color-text-muted); font-size: 10px; font-weight: 600; letter-spacing: .12em; white-space: nowrap; }
+.top-crumb b { color: var(--color-border); }
+.top-crumb strong { color: var(--color-ink); }
+.top-crumb em { padding: 4px 9px; border: 1px solid #e1d3f4; border-radius: 999px; background: #f3ecfb; color: var(--color-accent-strong); font-size: 9px; font-style: normal; }
+.top-cycle { margin-left: auto; }
+.expense-content.reference-expense-page { max-width: 1520px; padding: 38px clamp(28px, 3vw, 48px) 32px; }
+.reference-heading { align-items: flex-end; margin-bottom: 28px; }
+.reference-title-block { max-width: 760px; }
+.reference-eyebrow { margin-bottom: 9px; }
+.reference-title-block h1 { font-size: clamp(2.6rem, 4vw, 4rem); letter-spacing: -.045em; line-height: 1.03; }
+.reference-title-block h1 em { display: inline; color: var(--color-ink); }
+.reference-title-block p { max-width: 720px; margin-top: 13px; font-size: 15px; }
+.reference-heading-actions { gap: 12px; }
+.period-control button { min-height: 42px; padding: 0 15px; font-size: 11px; }
+.reference-heading-actions .export-button { min-height: 48px; padding: 0 20px; }
+.expense-kpis { gap: 16px; margin-bottom: 28px; }
+.expense-kpi { min-height: 152px; padding: 20px 22px 17px; }
+.kpi-label { font-size: 11px; }
+.expense-kpi > strong { margin: 13px 0 12px; font-size: clamp(1.65rem, 2.2vw, 2.2rem); }
+.expense-kpi > strong small { font-size: 10px; }
+.expense-kpi > small { font-size: 11px; }
+.reference-ledger { padding: 25px 26px 15px; }
+.reference-ledger-heading { align-items: center; }
+.reference-ledger-heading h2 { font-size: 24px; }
+.reference-ledger-heading p { font-size: 13px; }
+.ledger-tools { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; color: var(--color-text-muted); font-size: 11px; }
+.ledger-search { width: min(360px, 48%); min-height: 38px; display: flex; align-items: center; gap: 9px; padding: 0 11px; border: 1px solid var(--color-border); border-radius: 8px; background: #fbf9fd; color: #8a8195; }
+.ledger-search:focus-within { border-color: var(--color-accent); background: #fff; }
+.ledger-search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--color-ink); font-size: 12px; }
+.ledger-search input::placeholder { color: #948b9e; }
+.ledger-tools > span { white-space: nowrap; }
+.ledger-rule { margin-top: 14px; }
+.reference-table td { height: 82px; }
+.reference-table .expense-date, .reference-table .voucher-cell { color: var(--color-text-muted); }
+.reference-table .expense-status { text-transform: capitalize; letter-spacing: .01em; }
+.reference-table .expense-status.is-voided { border-color: #e6d9f2; background: #f4edfa; color: #8563aa; }
+.ledger-voided-note { color: #80778b; }
+@media (max-width: 920px) {
+  .finance-app { --finance-sidebar-width: 190px; }
+  .expense-workspace .expense-topbar { padding-right: 18px; padding-left: 18px; }
+  .expense-content.reference-expense-page { padding-right: 22px; padding-left: 22px; }
+  .reference-heading { align-items: flex-start; }
+  .reference-heading-actions { align-items: flex-start; }
+}
+@media (max-width: 760px) {
+  .reference-title-block h1 { font-size: 2.45rem; }
+  .ledger-tools { align-items: flex-start; flex-direction: column; }
+  .ledger-search { width: 100%; }
+}
+@media (max-width: 600px) {
+  .finance-app { --finance-sidebar-width: 55px; }
+  .expense-sidebar { position: fixed; }
+  .expense-workspace .expense-topbar { height: 59px; min-height: 59px; padding: 0 10px; }
+  .top-crumb { gap: 5px; font-size: 8px; letter-spacing: .04em; }
+  .top-crumb em { display: none; }
+  .top-cycle, .expense-topbar .top-divider { display: none; }
+  .top-user { margin-left: auto; }
+  .top-user strong { font-size: 9px; }
+  .top-user small { display: none; }
+  .expense-content.reference-expense-page { padding: 22px 13px; }
+  .reference-title-block h1 { font-size: 2.1rem; }
+  .reference-title-block p { font-size: 12px; }
+  .expense-kpi { padding: 12px 10px; }
+  .reference-ledger { padding: 15px 11px 10px; }
+  .ledger-actions { align-items: start; }
+  .ledger-categories { width: 100%; }
+  .journal-footer { align-items: flex-start; flex-direction: column; }
+}
+.expense-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0; }
+.expense-detail-grid > div { min-width: 0; padding-bottom: 12px; border-bottom: 1px solid var(--color-border); }
+.expense-detail-grid dt { margin-bottom: 4px; color: var(--color-text-muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.expense-detail-grid dd { margin: 0; color: var(--color-ink); font-size: 14px; overflow-wrap: anywhere; }
+.expense-detail-grid .detail-full { grid-column: 1 / -1; }
+@media (max-width: 420px) { .expense-detail-grid { grid-template-columns: 1fr; } .expense-detail-grid .detail-full { grid-column: auto; } }
