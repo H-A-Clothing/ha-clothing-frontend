@@ -275,6 +275,7 @@
 .ledger-actions { display: grid; justify-items: start; gap: 5px; }
 .ledger-categories { display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 9px; background: #f2eafb; }
 .ledger-categories button { min-height: 27px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; color: #766c82; font-size: 10px; cursor: pointer; }
+.ledger-categories button:disabled { opacity: .5; cursor: not-allowed; }
 .ledger-categories button.is-selected { background: #fff; color: #342842; box-shadow: 0 1px 4px rgba(48,32,69,.08); }
 .ledger-actions .record-button { min-height: 34px; min-width: 160px; padding: 0 12px; border-radius: 7px; background: #8158bd; box-shadow: none; font-size: 11px; }
 .ledger-actions .record-button:hover { background: #7049ac; }
@@ -331,3 +332,152 @@
 .expense-profile > svg { margin-left: auto; color: #716580; }
 @media (max-width: 920px) { .expense-sidebar { width: 190px; } .atelier-switcher { margin-right: 10px; margin-left: 10px; font-size: 8px; } }
 @media (max-width: 600px) { .expense-sidebar { width: 55px; min-width: 55px; padding-bottom: 12px; }.expense-brand { justify-content: center; padding: 0; }.expense-brand > div:last-child, .atelier-switcher, .expense-nav-label, .expense-nav-item span, .expense-profile { display: none; }.expense-nav { gap: 8px; padding: 12px 6px; }.expense-nav-item { justify-content: center; padding: 0; }.expense-nav-item.is-active svg { margin-left: 0; } }
+
+/* Expense management page: responsive editorial layout using the shared palette and type tokens. */
+.finance-app { --finance-sidebar-width: clamp(248px, 20vw, 320px); --finance-lilac: var(--color-accent-strong); }
+.expense-sidebar { width: var(--finance-sidebar-width); }
+.expense-workspace { width: calc(100% - var(--finance-sidebar-width)); margin-left: var(--finance-sidebar-width); }
+.expense-workspace .expense-topbar { height: 76px; min-height: 76px; padding: 0 clamp(24px, 3vw, 42px); background: #fff; }
+.top-crumb { display: flex; align-items: center; gap: 11px; color: var(--color-text-muted); font-size: 10px; font-weight: 600; letter-spacing: .12em; white-space: nowrap; }
+.top-crumb b { color: var(--color-border); }
+.top-crumb strong { color: var(--color-ink); }
+.top-crumb em { padding: 4px 9px; border: 1px solid #e1d3f4; border-radius: 999px; background: #f3ecfb; color: var(--color-accent-strong); font-size: 9px; font-style: normal; }
+.top-cycle { margin-left: auto; }
+.expense-content.reference-expense-page { max-width: 1520px; padding: 38px clamp(28px, 3vw, 48px) 32px; }
+.reference-heading { align-items: flex-end; margin-bottom: 28px; }
+.reference-title-block { max-width: 760px; }
+.reference-eyebrow { margin-bottom: 9px; }
+.reference-title-block h1 { font-size: clamp(2.6rem, 4vw, 4rem); letter-spacing: -.045em; line-height: 1.03; }
+.reference-title-block h1 em { display: inline; color: var(--color-ink); }
+.reference-title-block p { max-width: 720px; margin-top: 13px; font-size: 15px; }
+.reference-heading-actions { gap: 12px; }
+.period-control button { min-height: 42px; padding: 0 15px; font-size: 11px; }
+.reference-heading-actions .export-button { min-height: 48px; padding: 0 20px; }
+.expense-kpis { gap: 16px; margin-bottom: 28px; }
+.expense-kpi { min-height: 152px; padding: 20px 22px 17px; }
+.kpi-label { font-size: 11px; }
+.expense-kpi > strong { margin: 13px 0 12px; font-size: clamp(1.65rem, 2.2vw, 2.2rem); }
+.expense-kpi > strong small { font-size: 10px; }
+.expense-kpi > small { font-size: 11px; }
+.reference-ledger { padding: 25px 26px 15px; }
+.reference-ledger-heading { align-items: center; }
+.reference-ledger-heading h2 { font-size: 24px; }
+.reference-ledger-heading p { font-size: 13px; }
+.ledger-tools { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; color: var(--color-text-muted); font-size: 11px; }
+.ledger-search { width: min(360px, 48%); min-height: 38px; display: flex; align-items: center; gap: 9px; padding: 0 11px; border: 1px solid var(--color-border); border-radius: 8px; background: #fbf9fd; color: #8a8195; }
+.ledger-search:focus-within { border-color: var(--color-accent); background: #fff; }
+.ledger-search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--color-ink); font-size: 12px; }
+.ledger-search input::placeholder { color: #948b9e; }
+.ledger-tools > span { white-space: nowrap; }
+.ledger-rule { margin-top: 14px; }
+.reference-table td { height: 82px; }
+.reference-table .expense-date, .reference-table .voucher-cell { color: var(--color-text-muted); }
+.reference-table .expense-status { text-transform: capitalize; letter-spacing: .01em; }
+.reference-table .expense-status.is-voided { border-color: #e6d9f2; background: #f4edfa; color: #8563aa; }
+.ledger-voided-note { color: #80778b; }
+@media (max-width: 920px) {
+  .finance-app { --finance-sidebar-width: 190px; }
+  .expense-workspace .expense-topbar { padding-right: 18px; padding-left: 18px; }
+  .expense-content.reference-expense-page { padding-right: 22px; padding-left: 22px; }
+  .reference-heading { align-items: flex-start; }
+  .reference-heading-actions { align-items: flex-start; }
+}
+@media (max-width: 760px) {
+  .reference-title-block h1 { font-size: 2.45rem; }
+  .ledger-tools { align-items: flex-start; flex-direction: column; }
+  .ledger-search { width: 100%; }
+}
+@media (max-width: 600px) {
+  .finance-app { --finance-sidebar-width: 55px; }
+  .expense-sidebar { position: fixed; }
+  .expense-workspace .expense-topbar { height: 59px; min-height: 59px; padding: 0 10px; }
+  .top-crumb { gap: 5px; font-size: 8px; letter-spacing: .04em; }
+  .top-crumb em { display: none; }
+  .top-cycle, .expense-topbar .top-divider { display: none; }
+  .top-user { margin-left: auto; }
+  .top-user strong { font-size: 9px; }
+  .top-user small { display: none; }
+  .expense-content.reference-expense-page { padding: 22px 13px; }
+  .reference-title-block h1 { font-size: 2.1rem; }
+  .reference-title-block p { font-size: 12px; }
+  .expense-kpi { padding: 12px 10px; }
+  .reference-ledger { padding: 15px 11px 10px; }
+  .ledger-actions { align-items: start; }
+  .ledger-categories { width: 100%; }
+  .journal-footer { align-items: flex-start; flex-direction: column; }
+}
+.expense-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0; }
+.expense-detail-grid > div { min-width: 0; padding-bottom: 12px; border-bottom: 1px solid var(--color-border); }
+.expense-detail-grid dt { margin-bottom: 4px; color: var(--color-text-muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.expense-detail-grid dd { margin: 0; color: var(--color-ink); font-size: 14px; overflow-wrap: anywhere; }
+.expense-detail-grid .detail-full { grid-column: 1 / -1; }
+@media (max-width: 420px) { .expense-detail-grid { grid-template-columns: 1fr; } .expense-detail-grid .detail-full { grid-column: auto; } }
+
+/* Expense CRUD and category pages. */
+.reference-table th:nth-child(1) { width: 11%; }
+.reference-table th:nth-child(2) { width: 17%; }
+.reference-table th:nth-child(3) { width: 14%; }
+.reference-table th:nth-child(4) { width: 21%; }
+.reference-table th:nth-child(5) { width: 16%; }
+.reference-table th:nth-child(6) { width: 13%; text-align: right; }
+.reference-table th:nth-child(7) { width: 8%; }
+.expense-table.reference-table td:last-child { text-align: center; }
+.expense-view-button { display: inline-flex; align-items: center; justify-content: center; min-width: 52px; min-height: 31px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; color: var(--color-ink); font-size: 11px; font-weight: 700; transition: border-color .16s ease, background-color .16s ease; }
+.expense-view-button:hover { border-color: var(--color-accent); background: #f7f2fc; }
+.expense-content .ledger-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+.expense-content .ledger-categories { width: max-content; max-width: 100%; overflow-x: auto; }
+.expense-content .ledger-categories button { flex: 0 0 auto; }
+.expense-content .ledger-actions .expense-button { min-width: 0; min-height: 38px; padding: 0 12px; font-size: 10px; }
+.expense-content .ledger-actions .record-button { color: #fff; }
+.expense-content .reference-ledger-heading { align-items: flex-start; }
+.expense-subpage-heading { align-items: center; }
+.expense-subpage-heading .reference-title-block h1 { font-size: clamp(2.1rem, 3.3vw, 3rem); }
+.expense-subpage-heading .export-button { min-height: 42px; border-radius: 7px; font-size: 11px; }
+.expense-editor-card, .expense-detail-card { padding: 25px 28px; border: 1px solid #e9e1f1; border-radius: 13px; background: #fff; box-shadow: 0 4px 14px rgba(62,40,89,.025); }
+.expense-editor-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 21px; padding-bottom: 15px; border-bottom: 1px solid #eee9f3; }
+.expense-editor-heading h2, .expense-detail-heading h2 { color: var(--color-ink); font-family: var(--font-serif); font-size: 22px; font-weight: 400; }
+.expense-editor-heading p { margin-top: 4px; color: var(--color-text-muted); font-size: 12px; }
+.expense-editor-form .form-grid { gap: 14px 16px; }
+.expense-editor-form .expense-field > span { margin-bottom: 6px; font-size: 11px; }
+.expense-editor-form .expense-field input, .expense-editor-form .expense-field select, .expense-editor-form .expense-field textarea, .expense-editor-form .amount-input { min-height: 42px; font-size: 13px; }
+.expense-editor-form .expense-field textarea { min-height: 78px; padding-top: 10px; }
+.expense-editor-form .expense-form-actions { margin-top: 21px; }
+.expense-editor-form .expense-button { min-height: 42px; font-size: 11px; }
+.expense-page-error, .expense-error { margin-bottom: 14px; padding: 10px 13px; border: 1px solid #efcdcd; border-radius: 6px; background: #fff7f7; color: #9b3434; font-size: 13px; }
+.expense-detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 23px; padding-bottom: 18px; border-bottom: 1px solid var(--color-border); }
+.expense-detail-heading h2 { margin-top: 5px; }
+.expense-detail-actions { display: flex; gap: 9px; }
+.expense-detail-actions .expense-button { min-height: 40px; border-radius: 6px; font-size: 11px; }
+.delete-button { border-color: #efcccc; background: #fff; color: #a23e47 !important; }
+.delete-button:hover { background: #fff3f3; }
+.expense-detail-card .expense-detail-grid { gap: 20px 26px; }
+.expense-detail-card .expense-detail-grid > div { padding-bottom: 15px; }
+.expense-detail-card .expense-detail-grid dt { font-size: 10px; }
+.expense-detail-card .expense-detail-grid dd { font-size: 15px; }
+.category-editor-card { margin-bottom: 18px; }
+.category-add-form { display: flex; align-items: flex-end; gap: 12px; }
+.category-add-form .expense-field { flex: 1; }
+.category-add-form .expense-field > span { font-size: 11px; }
+.category-add-form .expense-field input { height: 42px; font-size: 13px; }
+.category-add-form .expense-button { min-height: 42px; border-radius: 6px; font-size: 11px; }
+.category-list { display: grid; }
+.category-list-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 2px; border-bottom: 1px solid #f0ebf4; }
+.category-list-row:last-child { border-bottom: 0; }
+.category-list-row > div { display: grid; gap: 3px; }
+.category-list-row strong { color: var(--color-ink); font-size: 13px; }
+.category-list-row small { color: var(--color-text-muted); font-size: 11px; }
+.category-remove-button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 9px; border: 1px solid #efcccc; border-radius: 5px; background: #fff; color: #a23e47; font-size: 11px; }
+.category-remove-button:hover { background: #fff3f3; }
+@media (max-width: 920px) {
+  .expense-content .reference-ledger-heading { flex-direction: column; }
+  .expense-content .ledger-actions { width: 100%; justify-content: flex-start; }
+}
+@media (max-width: 600px) {
+  .expense-editor-card, .expense-detail-card { padding: 17px 14px; }
+  .expense-subpage-heading { align-items: flex-start; }
+  .expense-content .ledger-actions { align-items: flex-start; flex-direction: column; }
+  .expense-content .ledger-categories { width: 100%; max-width: 100%; }
+  .expense-detail-heading { align-items: flex-start; flex-direction: column; }
+  .category-add-form { align-items: stretch; flex-direction: column; }
+  .category-add-form .expense-field { width: 100%; }
+}

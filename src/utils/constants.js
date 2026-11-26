@@ -19,6 +19,8 @@ export const PAYMENT_METHODS = {
   PAYHERE: "payhere",
 };
 
+export const EXPENSE_PAYMENT_METHODS = ["Bank transfer", "Cash", "Card", "Cheque"];
+
 export const PAYMENT_STATUS = {
   PENDING: "pending",
   SUCCEEDED: "succeeded",
