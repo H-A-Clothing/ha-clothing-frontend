@@ -1,4 +1,4 @@
-// M7 – financial management and reporting.
+// Admin routes: M7 (Finance) + M8 (System Administration & RBAC).
 import ExpensePage from "../features/finance/pages/ExpensePage";
 import ExpenseEditorPage from "../features/finance/pages/ExpenseEditorPage";
 import ExpenseDetailsPage from "../features/finance/pages/ExpenseDetailsPage";
@@ -6,7 +6,13 @@ import ExpenseCategoriesPage from "../features/finance/pages/ExpenseCategoriesPa
 import FinanceLayout from "../components/layout/FinanceLayout";
 import FinanceSection from "../features/finance/components/FinanceSection";
 
+import ProtectedRoute from "./ProtectedRoute";
+import AdminShell from "../features/admin/components/AdminShell";
+import StaffRolesPage from "../features/admin/pages/StaffRolesPage";
+import AdminProfilePage from "../features/admin/pages/AdminProfilePage";
+
 export const adminRoutes = [
+  // M7 – Financial management and reporting
   {
     path: "/admin/finance",
     element: <FinanceLayout />,
@@ -17,10 +23,30 @@ export const adminRoutes = [
       { path: "expenses/categories", element: <ExpenseCategoriesPage /> },
       { path: "expenses/:id/edit", element: <ExpenseEditorPage editing /> },
       { path: "expenses/:id", element: <ExpenseDetailsPage /> },
-      { path: "product-costs", element: <FinanceSection title="Product Costs" /> },
+      {
+        path: "product-costs",
+        element: <FinanceSection title="Product Costs" />,
+      },
       { path: "reports", element: <FinanceSection title="Reports" /> },
-      { path: "reconciliation", element: <FinanceSection title="Reconciliation" /> },
+      {
+        path: "reconciliation",
+        element: <FinanceSection title="Reconciliation" />,
+      },
       { path: "settings", element: <FinanceSection title="Settings" /> },
+    ],
+  },
+
+  // M8 – System administration, staff & role management
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRoute>
+        <AdminShell />
+      </ProtectedRoute>
+    ),
+    children: [
+      { path: "staff", element: <StaffRolesPage /> },
+      { path: "profile", element: <AdminProfilePage /> },
     ],
   },
 ];
